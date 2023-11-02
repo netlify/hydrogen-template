@@ -6,3 +6,6 @@ node_modules
 /.mf
 .env
 .shopify
+
+# Local Netlify folder
+.netlify

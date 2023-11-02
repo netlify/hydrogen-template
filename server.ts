@@ -1,5 +1,6 @@
 // Virtual entry point for the app
 import * as remixBuild from '@remix-run/dev/server-build';
+
 import {
   cartGetIdDefault,
   cartSetIdDefault,
@@ -7,91 +8,116 @@ import {
   createStorefrontClient,
   storefrontRedirect,
 } from '@shopify/hydrogen';
+
 import {
-  createRequestHandler,
-  getStorefrontHeaders,
   createCookieSessionStorage,
+  broadcastDevReady,
   type SessionStorage,
   type Session,
-} from '@shopify/remix-oxygen';
+} from '@netlify/remix-runtime';
 
-/**
- * Export a fetch handler in module format.
- */
-export default {
-  async fetch(
-    request: Request,
-    env: Env,
-    executionContext: ExecutionContext,
-  ): Promise<Response> {
-    try {
-      /**
-       * Open a cache instance in the worker and a custom session instance.
-       */
-      if (!env?.SESSION_SECRET) {
-        throw new Error('SESSION_SECRET environment variable is not set');
-      }
+import {createRequestHandler} from '@netlify/remix-edge-adapter';
+import type {Context} from '@netlify/edge-functions';
 
-      const waitUntil = executionContext.waitUntil.bind(executionContext);
-      const [cache, session] = await Promise.all([
-        caches.open('hydrogen'),
-        HydrogenSession.init(request, [env.SESSION_SECRET]),
-      ]);
+export default async function handler(
+  request: Request,
+  context: Context,
+): Promise<Response | void> {
+  try {
+    const env = Netlify.env.toObject() as unknown as Env;
 
-      /**
-       * Create Hydrogen's Storefront client.
-       */
-      const {storefront} = createStorefrontClient({
-        cache,
-        waitUntil,
-        i18n: {language: 'EN', country: 'US'},
-        publicStorefrontToken: env.PUBLIC_STOREFRONT_API_TOKEN,
-        privateStorefrontToken: env.PRIVATE_STOREFRONT_API_TOKEN,
-        storeDomain: env.PUBLIC_STORE_DOMAIN,
-        storefrontId: env.PUBLIC_STOREFRONT_ID,
-        storefrontHeaders: getStorefrontHeaders(request),
-      });
-
-      /*
-       * Create a cart handler that will be used to
-       * create and update the cart in the session.
-       */
-      const cart = createCartHandler({
-        storefront,
-        getCartId: cartGetIdDefault(request.headers),
-        setCartId: cartSetIdDefault(),
-        cartQueryFragment: CART_QUERY_FRAGMENT,
-      });
-
-      /**
-       * Create a Remix request handler and pass
-       * Hydrogen's Storefront client to the loader context.
-       */
-      const handleRequest = createRequestHandler({
-        build: remixBuild,
-        mode: process.env.NODE_ENV,
-        getLoadContext: () => ({session, storefront, cart, env, waitUntil}),
-      });
-
-      const response = await handleRequest(request);
-
-      if (response.status === 404) {
-        /**
-         * Check for redirects only when there's a 404 from the app.
-         * If the redirect doesn't exist, then `storefrontRedirect`
-         * will pass through the 404 response.
-         */
-        return storefrontRedirect({request, response, storefront});
-      }
-
-      return response;
-    } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error(error);
-      return new Response('An unexpected error occurred', {status: 500});
+    /**
+     * Open a cache instance in the worker and a custom session instance.
+     */
+    if (!env.SESSION_SECRET) {
+      throw new Error('SESSION_SECRET environment variable is not set');
     }
-  },
+
+    const session = await HydrogenSession.init(request, [env.SESSION_SECRET]);
+
+    /**
+     * Create Hydrogen's Storefront client.
+     */
+    const {storefront} = createStorefrontClient({
+      i18n: {language: 'EN', country: 'US'},
+      publicStorefrontToken: env.PUBLIC_STOREFRONT_API_TOKEN,
+      privateStorefrontToken: env.PRIVATE_STOREFRONT_API_TOKEN,
+      storeDomain: env.PUBLIC_STORE_DOMAIN,
+      storefrontId: env.PUBLIC_STOREFRONT_ID,
+      storefrontHeaders: getStorefrontHeaders(request, context),
+    });
+
+    /*
+     * Create a cart handler that will be used to
+     * create and update the cart in the session.
+     */
+    const cart = createCartHandler({
+      storefront,
+      getCartId: cartGetIdDefault(request.headers),
+      setCartId: cartSetIdDefault(),
+      cartQueryFragment: CART_QUERY_FRAGMENT,
+    });
+
+    const loadContext = {
+      ...context,
+      session,
+      storefront,
+      cart,
+      env,
+    };
+
+    /**
+     * Create a Remix request handler and pass
+     * Hydrogen's Storefront client to the loader context.
+     */
+    const handleRequest = createRequestHandler({
+      build: remixBuild,
+      mode: process.env.NODE_ENV,
+      getLoadContext: () => loadContext,
+    });
+
+    const response = await handleRequest(request, loadContext);
+
+    if (!response) {
+      return;
+    }
+
+    if (response.status === 404) {
+      /**
+       * Check for redirects only when there's a 404 from the app.
+       * If the redirect doesn't exist, then `storefrontRedirect`
+       * will pass through the 404 response.
+       */
+      return storefrontRedirect({request, response, storefront});
+    }
+
+    return response;
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error(error);
+    return new Response('An unexpected error occurred', {status: 500});
+  }
+}
+
+type StorefrontHeaders = {
+  requestGroupId: string | null;
+  buyerIp: string | null;
+  cookie: string | null;
+  purpose: string | null;
 };
+
+export function getStorefrontHeaders(
+  request: Request,
+  context: Context,
+): StorefrontHeaders {
+  const headers = request.headers;
+  return {
+    requestGroupId: headers.get('request-id'),
+    buyerIp: context.ip,
+    cookie: headers.get('cookie'),
+    purpose: headers.get('purpose'),
+  };
+}
 
 /**
  * This is a custom session implementation for your Hydrogen shop.
@@ -254,3 +280,18 @@ const CART_QUERY_FRAGMENT = `#graphql
     }
   }
 ` as const;
+
+if (process.env.NODE_ENV === 'development') {
+  // Tell remix dev that the server is ready
+  broadcastDevReady(remixBuild);
+}
+
+export const config = {
+  cache: 'manual',
+  path: '/*',
+  // Let the CDN handle requests for static assets, i.e. ^/_assets/*$
+  //
+  // Add other exclusions here, e.g. "^/api/*$" for custom Netlify functions or
+  // custom Netlify Edge Functions
+  excludedPath: ['/build/*', '/favicon.ico'],
+};
