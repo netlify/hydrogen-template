@@ -1,4 +1,4 @@
-import {json, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import {json, type LoaderFunctionArgs} from '@netlify/remix-runtime';
 import type {
   NormalizedPredictiveSearch,
   NormalizedPredictiveSearchResults,

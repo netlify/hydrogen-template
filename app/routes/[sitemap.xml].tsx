@@ -1,5 +1,5 @@
 import {flattenConnection} from '@shopify/hydrogen';
-import type {LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import type {LoaderFunctionArgs} from '@netlify/remix-runtime';
 import type {SitemapQuery} from 'storefrontapi.generated';
 
 /**

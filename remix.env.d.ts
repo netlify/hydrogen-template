@@ -27,7 +27,7 @@ declare global {
   }
 }
 
-declare module '@shopify/remix-oxygen' {
+declare module '@netlify/remix-runtime' {
   /**
    * Declare local additions to the Remix loader context.
    */

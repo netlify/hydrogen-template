@@ -1,5 +1,5 @@
 import {Suspense} from 'react';
-import {defer, redirect, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import {defer, redirect, type LoaderFunctionArgs} from '@netlify/remix-runtime';
 import {
   Await,
   Link,

@@ -1,4 +1,4 @@
-import {type ActionFunctionArgs, json, redirect} from '@shopify/remix-oxygen';
+import {type ActionFunctionArgs, json, redirect} from '@netlify/remix-runtime';
 import {Form, useActionData, type MetaFunction} from '@remix-run/react';
 
 type ActionResponse = {

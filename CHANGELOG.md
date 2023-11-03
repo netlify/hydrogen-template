@@ -123,7 +123,7 @@
   // root.tsx
 
   import {useMatches} from '@remix-run/react';
-  import {type SerializeFrom} from '@shopify/remix-oxygen';
+  import {type SerializeFrom} from '@netlify/remix-runtime';
 
   export const useRootLoaderData = () => {
     const [root] = useMatches();

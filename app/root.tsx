@@ -3,7 +3,7 @@ import {
   defer,
   type SerializeFrom,
   type LoaderFunctionArgs,
-} from '@shopify/remix-oxygen';
+} from '@netlify/remix-runtime';
 import {
   Links,
   Meta,

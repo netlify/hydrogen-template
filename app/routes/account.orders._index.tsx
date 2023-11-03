@@ -1,6 +1,6 @@
 import {Link, useLoaderData, type MetaFunction} from '@remix-run/react';
 import {Money, Pagination, getPaginationVariables} from '@shopify/hydrogen';
-import {json, redirect, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import {json, redirect, type LoaderFunctionArgs} from '@netlify/remix-runtime';
 import type {
   CustomerOrdersFragment,
   OrderItemFragment,

@@ -5,7 +5,7 @@ import {
   redirect,
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
-} from '@shopify/remix-oxygen';
+} from '@netlify/remix-runtime';
 import {
   Form,
   useActionData,

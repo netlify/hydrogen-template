@@ -3,7 +3,7 @@ import {
   redirect,
   type LoaderFunctionArgs,
   type ActionFunctionArgs,
-} from '@shopify/remix-oxygen';
+} from '@netlify/remix-runtime';
 import {Form, Link, useActionData} from '@remix-run/react';
 
 type ActionResponse = {

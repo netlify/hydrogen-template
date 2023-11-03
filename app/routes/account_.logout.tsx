@@ -1,4 +1,4 @@
-import {json, redirect, type ActionFunctionArgs} from '@shopify/remix-oxygen';
+import {json, redirect, type ActionFunctionArgs} from '@netlify/remix-runtime';
 import {type MetaFunction} from '@remix-run/react';
 
 export const meta: MetaFunction = () => {

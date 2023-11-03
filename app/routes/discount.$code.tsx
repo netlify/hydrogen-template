@@ -1,4 +1,4 @@
-import {redirect, type LoaderFunctionArgs} from '@shopify/remix-oxygen';
+import {redirect, type LoaderFunctionArgs} from '@netlify/remix-runtime';
 
 /**
  * Automatically applies a discount found on the url

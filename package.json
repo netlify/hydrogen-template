@@ -5,9 +5,9 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "shopify hydrogen build",
-    "dev": "remix dev --manual -c \"ntl dev --framework=#static\"",
-    "preview": "npm run build && shopify hydrogen preview",
+    "build": "remix build",
+    "dev": "remix dev --manual -c \"netlify dev\"",
+    "preview": "netlify serve",
     "lint": "eslint --no-error-on-unmatched-pattern --ext .js,.ts,.jsx,.tsx .",
     "typecheck": "tsc --noEmit",
     "codegen": "shopify hydrogen codegen"
@@ -21,7 +21,6 @@
     "@shopify/cli": "3.50.0",
     "@shopify/cli-hydrogen": "^6.0.0",
     "@shopify/hydrogen": "^2023.10.0",
-    "@shopify/remix-oxygen": "^2.0.0",
     "graphql": "^16.6.0",
     "graphql-tag": "^2.12.6",
     "isbot": "^3.6.6",

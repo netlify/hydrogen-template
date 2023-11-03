@@ -22,19 +22,22 @@ Hydrogen is Shopify’s stack for headless commerce. Hydrogen is designed to dov
 **Requirements:**
 
 - Node.js version 18.0.0 or higher
+- Netlify CLI 17.0.0 or higher
 
 ```bash
+npm install -g netlify-cli@latest
+
 npx create-remix@latest --template=netlify/hydrogen-template
-```
-
-## Building for production
-
-```bash
-npm run build
 ```
 
 ## Local development
 
 ```bash
 npm run dev
+```
+
+## Building for production
+
+```bash
+npm run build
 ```
