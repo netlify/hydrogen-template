@@ -19,5 +19,5 @@ for = "/build/*"
 # These are only used to set up the template, and are not used in the build
 # If you want to update the real values, change them in the site UI or CLI
 [template.environment]
-PUBLIC_STORE_DOMAIN = "Store domain. Leave as 'mock.shop' to see demo site"
-SESSION_SECRET = "Session secret - change me to a random value for production"
+PUBLIC_STORE_DOMAIN = "Store domain. Leave as 'mock.shop' to try the demo site"
+SESSION_SECRET = "Session secret - change to a random value for production"
