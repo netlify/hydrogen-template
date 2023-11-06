@@ -26,10 +26,11 @@ export default async function handler(
   try {
     const env = Netlify.env.toObject() as unknown as Env;
 
-    /**
-     * Open a cache instance in the worker and a custom session instance.
-     */
-    if (!env.SESSION_SECRET && env.PUBLIC_STORE_DOMAIN !== 'mock.shop') {
+    if (
+      !env.SESSION_SECRET &&
+      env.PUBLIC_STORE_DOMAIN &&
+      env.PUBLIC_STORE_DOMAIN !== 'mock.shop'
+    ) {
       throw new Error('SESSION_SECRET environment variable is not set');
     }
 
