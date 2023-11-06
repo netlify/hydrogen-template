@@ -29,11 +29,13 @@ export default async function handler(
     /**
      * Open a cache instance in the worker and a custom session instance.
      */
-    if (!env.SESSION_SECRET) {
+    if (!env.SESSION_SECRET && env.PUBLIC_STORE_DOMAIN !== 'mock.shop') {
       throw new Error('SESSION_SECRET environment variable is not set');
     }
 
-    const session = await HydrogenSession.init(request, [env.SESSION_SECRET]);
+    const session = await HydrogenSession.init(request, [
+      env.SESSION_SECRET ?? 'mock token',
+    ]);
 
     /**
      * Create Hydrogen's Storefront client.
@@ -42,7 +44,7 @@ export default async function handler(
       i18n: {language: 'EN', country: 'US'},
       publicStorefrontToken: env.PUBLIC_STOREFRONT_API_TOKEN,
       privateStorefrontToken: env.PRIVATE_STOREFRONT_API_TOKEN,
-      storeDomain: env.PUBLIC_STORE_DOMAIN,
+      storeDomain: env.PUBLIC_STORE_DOMAIN ?? 'mock.shop',
       storefrontId: env.PUBLIC_STOREFRONT_ID,
       storefrontHeaders: getStorefrontHeaders(request, context),
     });

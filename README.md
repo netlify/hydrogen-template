@@ -2,7 +2,7 @@
 
 Hydrogen is Shopify’s stack for headless commerce. Hydrogen is designed to dovetail with [Remix](https://remix.run/), Shopify’s full stack web framework. This template contains a **minimal setup** of components, queries and tooling to get started with Hydrogen.
 
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/ascorbic/hydrogen-storefront#SESSION_SECRET=mock%20token&PUBLIC_STORE_DOMAIN=mock.shop)
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/netlify/hydrogen-template#SESSION_SECRET=mock%20token&PUBLIC_STORE_DOMAIN=mock.shop)
 
 - [Check out Hydrogen docs](https://shopify.dev/custom-storefronts/hydrogen)
 - [Get familiar with Remix](https://remix.run/docs/)
@@ -29,12 +29,12 @@ Hydrogen is Shopify’s stack for headless commerce. Hydrogen is designed to dov
 npm install -g netlify-cli@latest
 ```
 
-[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/ascorbic/hydrogen-storefront#SESSION_SECRET=mock%20token&PUBLIC_STORE_DOMAIN=mock.shop)
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/netlify/hydrogen-template#SESSION_SECRET=mock%20token&PUBLIC_STORE_DOMAIN=mock.shop)
 
 To create a new project, either click the "Deploy to Netlify" button above, or run the following command:
 
 ```bash
-npx create-remix@latest --template=ascorbic/hydrogen-storefront
+npx create-remix@latest --template=netlify/hydrogen-template
 ```
 
 ## Local development
