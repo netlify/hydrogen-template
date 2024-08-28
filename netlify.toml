@@ -1,19 +1,15 @@
 [build]
-command = "npm run build"
-publish = "public"
+  command = "npm run build"
+  publish = "dist/client"
 
 [dev]
-# Run "npm run dev" to start the dev server
-# Enable the static server for edge functions, because Remix handles the dev server
-framework = "#static"
+  # FIXME(serhalp) This is `npm run build` in default Hydrogen config for some reason
+  command = "npm run dev"
 
 # Set immutable caching for static files, because they have fingerprinted filenames
-
 [[headers]]
 for = "/build/*"
-
 [headers.values]
-
 "Cache-Control" = "public, max-age=31560000, immutable"
 
 # These are only used to set up the template, and are not used in the build

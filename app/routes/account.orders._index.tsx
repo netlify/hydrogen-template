@@ -1,60 +1,47 @@
 import {Link, useLoaderData, type MetaFunction} from '@remix-run/react';
-import {Money, Pagination, getPaginationVariables} from '@shopify/hydrogen';
-import {json, redirect, type LoaderFunctionArgs} from '@netlify/remix-runtime';
+import {
+  Money,
+  getPaginationVariables,
+  flattenConnection,
+} from '@shopify/hydrogen';
+import {json, type LoaderFunctionArgs} from '@netlify/remix-runtime';
+import {CUSTOMER_ORDERS_QUERY} from '~/graphql/customer-account/CustomerOrdersQuery';
 import type {
   CustomerOrdersFragment,
   OrderItemFragment,
-} from 'storefrontapi.generated';
+} from 'customer-accountapi.generated';
+import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 
 export const meta: MetaFunction = () => {
   return [{title: 'Orders'}];
 };
 
 export async function loader({request, context}: LoaderFunctionArgs) {
-  const {session, storefront} = context;
+  const paginationVariables = getPaginationVariables(request, {
+    pageBy: 20,
+  });
 
-  const customerAccessToken = await session.get('customerAccessToken');
-  if (!customerAccessToken?.accessToken) {
-    return redirect('/account/login');
-  }
-
-  try {
-    const paginationVariables = getPaginationVariables(request, {
-      pageBy: 20,
-    });
-
-    const {customer} = await storefront.query(CUSTOMER_ORDERS_QUERY, {
+  const {data, errors} = await context.customerAccount.query(
+    CUSTOMER_ORDERS_QUERY,
+    {
       variables: {
-        customerAccessToken: customerAccessToken.accessToken,
-        country: storefront.i18n.country,
-        language: storefront.i18n.language,
         ...paginationVariables,
       },
-      cache: storefront.CacheNone(),
-    });
+    },
+  );
 
-    if (!customer) {
-      throw new Error('Customer not found');
-    }
-
-    return json({customer});
-  } catch (error: unknown) {
-    if (error instanceof Error) {
-      return json({error: error.message}, {status: 400});
-    }
-    return json({error}, {status: 400});
+  if (errors?.length || !data?.customer) {
+    throw Error('Customer orders not found');
   }
+
+  return json({customer: data.customer});
 }
 
 export default function Orders() {
   const {customer} = useLoaderData<{customer: CustomerOrdersFragment}>();
-  const {orders, numberOfOrders} = customer;
+  const {orders} = customer;
   return (
     <div className="orders">
-      <h2>
-        Orders <small>({numberOfOrders})</small>
-      </h2>
-      <br />
       {orders.nodes.length ? <OrdersTable orders={orders} /> : <EmptyOrders />}
     </div>
   );
@@ -64,23 +51,9 @@ function OrdersTable({orders}: Pick<CustomerOrdersFragment, 'orders'>) {
   return (
     <div className="acccount-orders">
       {orders?.nodes.length ? (
-        <Pagination connection={orders}>
-          {({nodes, isLoading, PreviousLink, NextLink}) => {
-            return (
-              <>
-                <PreviousLink>
-                  {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
-                </PreviousLink>
-                {nodes.map((order) => {
-                  return <OrderItem key={order.id} order={order} />;
-                })}
-                <NextLink>
-                  {isLoading ? 'Loading...' : <span>Load more ↓</span>}
-                </NextLink>
-              </>
-            );
-          }}
-        </Pagination>
+        <PaginatedResourceSection connection={orders}>
+          {({node: order}) => <OrderItem key={order.id} order={order} />}
+        </PaginatedResourceSection>
       ) : (
         <EmptyOrders />
       )}
@@ -101,91 +74,20 @@ function EmptyOrders() {
 }
 
 function OrderItem({order}: {order: OrderItemFragment}) {
+  const fulfillmentStatus = flattenConnection(order.fulfillments)[0]?.status;
   return (
     <>
       <fieldset>
-        <Link to={`/account/orders/${order.id}`}>
-          <strong>#{order.orderNumber}</strong>
+        <Link to={`/account/orders/${btoa(order.id)}`}>
+          <strong>#{order.number}</strong>
         </Link>
         <p>{new Date(order.processedAt).toDateString()}</p>
         <p>{order.financialStatus}</p>
-        <p>{order.fulfillmentStatus}</p>
-        <Money data={order.currentTotalPrice} />
+        {fulfillmentStatus && <p>{fulfillmentStatus}</p>}
+        <Money data={order.totalPrice} />
         <Link to={`/account/orders/${btoa(order.id)}`}>View Order →</Link>
       </fieldset>
       <br />
     </>
   );
 }
-
-const ORDER_ITEM_FRAGMENT = `#graphql
-  fragment OrderItem on Order {
-    currentTotalPrice {
-      amount
-      currencyCode
-    }
-    financialStatus
-    fulfillmentStatus
-    id
-    lineItems(first: 10) {
-      nodes {
-        title
-        variant {
-          image {
-            url
-            altText
-            height
-            width
-          }
-        }
-      }
-    }
-    orderNumber
-    customerUrl
-    statusUrl
-    processedAt
-  }
-` as const;
-
-export const CUSTOMER_FRAGMENT = `#graphql
-  fragment CustomerOrders on Customer {
-    numberOfOrders
-    orders(
-      sortKey: PROCESSED_AT,
-      reverse: true,
-      first: $first,
-      last: $last,
-      before: $startCursor,
-      after: $endCursor
-    ) {
-      nodes {
-        ...OrderItem
-      }
-      pageInfo {
-        hasPreviousPage
-        hasNextPage
-        endCursor
-        startCursor
-      }
-    }
-  }
-  ${ORDER_ITEM_FRAGMENT}
-` as const;
-
-// NOTE: https://shopify.dev/docs/api/storefront/latest/queries/customer
-const CUSTOMER_ORDERS_QUERY = `#graphql
-  ${CUSTOMER_FRAGMENT}
-  query CustomerOrders(
-    $country: CountryCode
-    $customerAccessToken: String!
-    $endCursor: String
-    $first: Int
-    $language: LanguageCode
-    $last: Int
-    $startCursor: String
-  ) @inContext(country: $country, language: $language) {
-    customer(customerAccessToken: $customerAccessToken) {
-      ...CustomerOrders
-    }
-  }
-` as const;
