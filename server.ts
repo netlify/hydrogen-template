@@ -16,11 +16,8 @@ export default async function handler(
   _context: Context,
 ): Promise<Response | undefined> {
   try {
-    const env = {
-      PUBLIC_STORE_DOMAIN: 'mock.shop',
+    const env = Netlify.env.toObject();
 
-      ...Netlify.env.toObject(),
-    };
     const waitUntil = waitUntilNotImplemented;
     const appLoadContext = await createAppLoadContext(request, env, waitUntil);
 
@@ -46,6 +43,10 @@ export default async function handler(
 
     if (!response) {
       return;
+    }
+
+    if (appLoadContext.session.isPending) {
+      response.headers.set('Set-Cookie', await appLoadContext.session.commit());
     }
 
     if (response.status === 404) {
