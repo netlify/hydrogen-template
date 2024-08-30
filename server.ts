@@ -6,20 +6,27 @@ import {storefrontRedirect} from '@shopify/hydrogen';
 import {broadcastDevReady} from '@netlify/remix-runtime';
 import {createAppLoadContext} from '~/lib/context';
 
-const waitUntilNotImplemented = async () => {
-  console.warn('waitUntil not implemented');
+/**
+ * Hydrogen expects a `waitUntil` function like the one in the workerd runtime:
+ * https://developers.cloudflare.com/workers/runtime-apis/context/#waituntil.
+ * Netlify Edge Functions don't have such a function, but Deno Deploy isolates make a best-effort
+ * attempt to wait for the event loop to drain, so just awaiting the promise here is equivalent.
+ */
+const waitUntil = async (p: Promise<unknown>): Promise<void> => {
+  await p;
 };
 
 export default async function handler(
   request: Request,
-  // FIXME(serhalp) How is it possible we aren't using this?
-  _context: Context,
+  netlifyContext: Context,
 ): Promise<Response | undefined> {
   try {
     const env = Netlify.env.toObject();
 
-    const waitUntil = waitUntilNotImplemented;
-    const appLoadContext = await createAppLoadContext(request, env, waitUntil);
+    const appLoadContext = {
+      ...netlifyContext,
+      ...(await createAppLoadContext(request, env, waitUntil)),
+    };
 
     if (
       !env.SESSION_SECRET &&
