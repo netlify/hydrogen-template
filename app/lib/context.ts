@@ -2,7 +2,9 @@ import {createHydrogenContext, InMemoryCache} from '@shopify/hydrogen';
 import {AppSession} from '~/lib/session';
 import {CART_QUERY_FRAGMENT} from '~/lib/fragments';
 
-type WaitUntil = (promise: Promise<unknown>) => void;
+interface ExecutionContext {
+  waitUntil(promise: Promise<unknown>): Promise<void>;
+}
 
 /**
  * The context implementation is separate from server.ts
@@ -11,7 +13,7 @@ type WaitUntil = (promise: Promise<unknown>) => void;
 export async function createAppLoadContext(
   request: Request,
   env: Env,
-  waitUntil: WaitUntil,
+  executionContext: ExecutionContext,
 ) {
   /**
    * Open a cache instance in the worker and a custom session instance.
@@ -26,7 +28,7 @@ export async function createAppLoadContext(
     env,
     request,
     cache: new InMemoryCache(),
-    waitUntil,
+    waitUntil: executionContext.waitUntil,
     session,
     i18n: {language: 'EN', country: 'US'},
     cart: {

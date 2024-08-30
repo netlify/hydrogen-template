@@ -2,10 +2,6 @@
   command = "npm run build"
   publish = "dist/client"
 
-[dev]
-  # FIXME(serhalp) This is `npm run build` in default Hydrogen config for some reason
-  command = "npm run dev"
-
 # Set immutable caching for static files, because they have fingerprinted filenames
 [[headers]]
 for = "/build/*"
