@@ -12,8 +12,7 @@ const waitUntilNotImplemented = async () => {
 
 export default async function handler(
   request: Request,
-  // FIXME(serhalp) How is it possible we aren't using this?
-  _context: Context,
+  context: Context,
 ): Promise<Response | undefined> {
   try {
     const env = Netlify.env.toObject();
@@ -29,6 +28,7 @@ export default async function handler(
       throw new Error('SESSION_SECRET environment variable is not set');
     }
 
+    const loadContext = {...context, ...appLoadContext};
     /**
      * Create a Remix request handler and pass
      * Hydrogen's Storefront client to the loader context.
@@ -36,10 +36,10 @@ export default async function handler(
     const handleRequest = createRequestHandler({
       build: remixBuild,
       mode: process.env.NODE_ENV,
-      getLoadContext: () => appLoadContext,
+      getLoadContext: () => loadContext,
     });
 
-    const response = await handleRequest(request, appLoadContext);
+    const response = await handleRequest(request, loadContext);
 
     if (!response) {
       return;
