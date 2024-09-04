@@ -3,9 +3,7 @@
   publish = "dist/client"
 
 [dev]
-  # FIXME(serhalp) This is `npm run build` in default Hydrogen config for some reason
-  command = "remix vite:dev"
-  targetPort = 5173
+  command = "npm run dev"
 
 # Set immutable caching for static files, because they have fingerprinted filenames
 [[headers]]

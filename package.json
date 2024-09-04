@@ -7,9 +7,9 @@
   "scripts": {
     "build": "remix vite:build",
     "codegen": "shopify hydrogen codegen",
-    "dev": "remix vite:dev",
+    "dev": "shopify hydrogen dev --codegen",
     "lint": "eslint --no-error-on-unmatched-pattern --ext .js,.ts,.jsx,.tsx .",
-    "preview": "shopify hydrogen preview --build",
+    "preview": "netlify serve",
     "typecheck": "tsc"
   },
   "prettier": "@shopify/prettier-config",
