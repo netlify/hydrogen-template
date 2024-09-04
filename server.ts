@@ -3,7 +3,6 @@ import * as remixBuild from 'virtual:remix/server-build';
 import type {Context} from '@netlify/edge-functions';
 import {createRequestHandler} from '@netlify/remix-edge-adapter';
 import {storefrontRedirect} from '@shopify/hydrogen';
-import {broadcastDevReady} from '@netlify/remix-runtime';
 import {createAppLoadContext} from '~/lib/context';
 
 const executionContext = {
@@ -76,9 +75,4 @@ export default async function handler(
     console.error(error);
     return new Response('An unexpected error occurred', {status: 500});
   }
-}
-
-if (process.env.NODE_ENV === 'development') {
-  // Tell remix dev that the server is ready
-  broadcastDevReady(remixBuild);
 }
