@@ -1,13 +1,12 @@
 // @ts-ignore -- virtual entry point for the app, resolved by Vite at build time
 import * as remixBuild from 'virtual:remix/server-build';
 import type {Context} from '@netlify/edge-functions';
-import {storefrontRedirect} from '@shopify/hydrogen';
-
-import {createAppLoadContext} from '~/lib/context';
 import {
   createHydrogenAppLoadContext,
   createRequestHandler,
 } from '@netlify/remix-edge-adapter';
+import {storefrontRedirect} from '@shopify/hydrogen';
+import {createAppLoadContext} from '~/lib/context';
 
 export default async function (
   request: Request,
