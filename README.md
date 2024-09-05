@@ -41,6 +41,8 @@ To create a new project, either click the "Deploy to Netlify" button above, or r
 npx create-remix@latest --template=netlify/hydrogen-template
 ```
 
+Then follow the instructions in `.env.example` and you're ready to start developing.
+
 ## Local development
 
 ```bash
