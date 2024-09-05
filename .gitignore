@@ -5,6 +5,7 @@ node_modules
 /public/build
 /.mf
 .env
+.env.*
 .shopify
 
 # Local Netlify folder

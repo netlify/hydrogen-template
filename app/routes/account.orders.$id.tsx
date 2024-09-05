@@ -1,36 +1,35 @@
 import {json, redirect, type LoaderFunctionArgs} from '@netlify/remix-runtime';
-import {Link, useLoaderData, type MetaFunction} from '@remix-run/react';
+import {useLoaderData, type MetaFunction} from '@remix-run/react';
 import {Money, Image, flattenConnection} from '@shopify/hydrogen';
-import type {OrderLineItemFullFragment} from 'storefrontapi.generated';
+import type {OrderLineItemFullFragment} from 'customer-accountapi.generated';
+import {CUSTOMER_ORDER_QUERY} from '~/graphql/customer-account/CustomerOrderQuery';
 
 export const meta: MetaFunction<typeof loader> = ({data}) => {
   return [{title: `Order ${data?.order?.name}`}];
 };
 
 export async function loader({params, context}: LoaderFunctionArgs) {
-  const {session, storefront} = context;
-
   if (!params.id) {
     return redirect('/account/orders');
   }
 
   const orderId = atob(params.id);
-  const customerAccessToken = await session.get('customerAccessToken');
+  const {data, errors} = await context.customerAccount.query(
+    CUSTOMER_ORDER_QUERY,
+    {
+      variables: {orderId},
+    },
+  );
 
-  if (!customerAccessToken) {
-    return redirect('/account/login');
+  if (errors?.length || !data?.order) {
+    throw new Error('Order not found');
   }
 
-  const {order} = await storefront.query(CUSTOMER_ORDER_QUERY, {
-    variables: {orderId},
-  });
-
-  if (!order || !('lineItems' in order)) {
-    throw new Response('Order not found', {status: 404});
-  }
+  const {order} = data;
 
   const lineItems = flattenConnection(order.lineItems);
   const discountApplications = flattenConnection(order.discountApplications);
+  const fulfillmentStatus = flattenConnection(order.fulfillments)[0].status;
 
   const firstDiscount = discountApplications[0]?.value;
 
@@ -46,12 +45,18 @@ export async function loader({params, context}: LoaderFunctionArgs) {
     lineItems,
     discountValue,
     discountPercentage,
+    fulfillmentStatus,
   });
 }
 
 export default function OrderRoute() {
-  const {order, lineItems, discountValue, discountPercentage} =
-    useLoaderData<typeof loader>();
+  const {
+    order,
+    lineItems,
+    discountValue,
+    discountPercentage,
+    fulfillmentStatus,
+  } = useLoaderData<typeof loader>();
   return (
     <div className="account-order">
       <h2>Order {order.name}</h2>
@@ -100,7 +105,7 @@ export default function OrderRoute() {
                 <p>Subtotal</p>
               </th>
               <td>
-                <Money data={order.subtotalPriceV2!} />
+                <Money data={order.subtotal!} />
               </td>
             </tr>
             <tr>
@@ -111,7 +116,7 @@ export default function OrderRoute() {
                 <p>Tax</p>
               </th>
               <td>
-                <Money data={order.totalTaxV2!} />
+                <Money data={order.totalTax!} />
               </td>
             </tr>
             <tr>
@@ -122,7 +127,7 @@ export default function OrderRoute() {
                 <p>Total</p>
               </th>
               <td>
-                <Money data={order.totalPriceV2!} />
+                <Money data={order.totalPrice!} />
               </td>
             </tr>
           </tfoot>
@@ -131,17 +136,16 @@ export default function OrderRoute() {
           <h3>Shipping Address</h3>
           {order?.shippingAddress ? (
             <address>
-              <p>
-                {order.shippingAddress.firstName &&
-                  order.shippingAddress.firstName + ' '}
-                {order.shippingAddress.lastName}
-              </p>
-              {order?.shippingAddress?.formatted ? (
-                order.shippingAddress.formatted.map((line: string) => (
-                  <p key={line}>{line}</p>
-                ))
+              <p>{order.shippingAddress.name}</p>
+              {order.shippingAddress.formatted ? (
+                <p>{order.shippingAddress.formatted}</p>
               ) : (
-                <></>
+                ''
+              )}
+              {order.shippingAddress.formattedArea ? (
+                <p>{order.shippingAddress.formattedArea}</p>
+              ) : (
+                ''
               )}
             </address>
           ) : (
@@ -149,13 +153,13 @@ export default function OrderRoute() {
           )}
           <h3>Status</h3>
           <div>
-            <p>{order.fulfillmentStatus}</p>
+            <p>{fulfillmentStatus}</p>
           </div>
         </div>
       </div>
       <br />
       <p>
-        <a target="_blank" href={order.statusUrl} rel="noreferrer">
+        <a target="_blank" href={order.statusPageUrl} rel="noreferrer">
           View Order Status →
         </a>
       </p>
@@ -165,145 +169,27 @@ export default function OrderRoute() {
 
 function OrderLineRow({lineItem}: {lineItem: OrderLineItemFullFragment}) {
   return (
-    <tr key={lineItem.variant!.id}>
+    <tr key={lineItem.id}>
       <td>
         <div>
-          <Link to={`/products/${lineItem.variant!.product!.handle}`}>
-            {lineItem?.variant?.image && (
-              <div>
-                <Image data={lineItem.variant.image} width={96} height={96} />
-              </div>
-            )}
-          </Link>
+          {lineItem?.image && (
+            <div>
+              <Image data={lineItem.image} width={96} height={96} />
+            </div>
+          )}
           <div>
             <p>{lineItem.title}</p>
-            <small>{lineItem.variant!.title}</small>
+            <small>{lineItem.variantTitle}</small>
           </div>
         </div>
       </td>
       <td>
-        <Money data={lineItem.variant!.price!} />
+        <Money data={lineItem.price!} />
       </td>
       <td>{lineItem.quantity}</td>
       <td>
-        <Money data={lineItem.discountedTotalPrice!} />
+        <Money data={lineItem.totalDiscount!} />
       </td>
     </tr>
   );
 }
-
-// NOTE: https://shopify.dev/docs/api/storefront/latest/objects/Order
-const CUSTOMER_ORDER_QUERY = `#graphql
-  fragment OrderMoney on MoneyV2 {
-    amount
-    currencyCode
-  }
-  fragment AddressFull on MailingAddress {
-    address1
-    address2
-    city
-    company
-    country
-    countryCodeV2
-    firstName
-    formatted
-    id
-    lastName
-    name
-    phone
-    province
-    provinceCode
-    zip
-  }
-  fragment DiscountApplication on DiscountApplication {
-    value {
-      __typename
-      ... on MoneyV2 {
-        ...OrderMoney
-      }
-      ... on PricingPercentageValue {
-        percentage
-      }
-    }
-  }
-  fragment OrderLineProductVariant on ProductVariant {
-    id
-    image {
-      altText
-      height
-      url
-      id
-      width
-    }
-    price {
-      ...OrderMoney
-    }
-    product {
-      handle
-    }
-    sku
-    title
-  }
-  fragment OrderLineItemFull on OrderLineItem {
-    title
-    quantity
-    discountAllocations {
-      allocatedAmount {
-        ...OrderMoney
-      }
-      discountApplication {
-        ...DiscountApplication
-      }
-    }
-    originalTotalPrice {
-      ...OrderMoney
-    }
-    discountedTotalPrice {
-      ...OrderMoney
-    }
-    variant {
-      ...OrderLineProductVariant
-    }
-  }
-  fragment Order on Order {
-    id
-    name
-    orderNumber
-    statusUrl
-    processedAt
-    fulfillmentStatus
-    totalTaxV2 {
-      ...OrderMoney
-    }
-    totalPriceV2 {
-      ...OrderMoney
-    }
-    subtotalPriceV2 {
-      ...OrderMoney
-    }
-    shippingAddress {
-      ...AddressFull
-    }
-    discountApplications(first: 100) {
-      nodes {
-        ...DiscountApplication
-      }
-    }
-    lineItems(first: 100) {
-      nodes {
-        ...OrderLineItemFull
-      }
-    }
-  }
-  query Order(
-    $country: CountryCode
-    $language: LanguageCode
-    $orderId: ID!
-  ) @inContext(country: $country, language: $language) {
-    order: node(id: $orderId) {
-      ... on Order {
-        ...Order
-      }
-    }
-  }
-` as const;
