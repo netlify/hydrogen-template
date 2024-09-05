@@ -22,7 +22,7 @@ Hydrogen is Shopify’s stack for headless commerce. Hydrogen is designed to dov
 
 ## Getting started
 
-It is highly recommended to use this template to deploy a Hydrogen site to Netlify.
+We highly recommend using this template to deploy a Hydrogen site to Netlify.
 
 **Requirements:**
 
@@ -61,9 +61,8 @@ See `app/lib/context.ts` and the Hydrogen documentation.
 
 ## How do I augment the Remix context?
 
-Simply add your custom context to the object returned by the `createAppLoadContext` function in
-`app/lib/context.ts` and ensured the return type is updated (e.g. `HydrogenContext & {foo:
-string}`).
+Add your custom context to the object returned by the `createAppLoadContext` function in
+`app/lib/context.ts` and ensure the return type is updated (e.g. `HydrogenContext & {foo: string}`).
 
 ### How do I configure a real Shopify store in local dev?
 
