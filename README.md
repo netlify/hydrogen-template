@@ -38,7 +38,7 @@ npm install -g netlify-cli@latest
 To create a new project, either click the "Deploy to Netlify" button above, or run the following command:
 
 ```bash
-npx create-remix@latest --template=netlify/hydrogen-template
+npm create @shopify/hydrogen@latest -- --template https://github.com/netlify/hydrogen-template
 ```
 
 Then follow the instructions in `.env.example` and you're ready to start developing.
