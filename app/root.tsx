@@ -16,6 +16,7 @@ import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import {PageLayout} from '~/components/PageLayout';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
+import {CartProvider} from './components/CartProvider';
 
 export type RootLoader = typeof loader;
 
@@ -105,7 +106,7 @@ async function loadCriticalData({context}: LoaderFunctionArgs) {
  * Make sure to not throw any errors here, as it will cause the page to 500.
  */
 function loadDeferredData({context}: LoaderFunctionArgs) {
-  const {storefront, customerAccount, cart} = context;
+  const {storefront} = context;
 
   // defer the footer query (below the fold)
   const footer = storefront
@@ -121,8 +122,6 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
       return null;
     });
   return {
-    cart: cart.get(),
-    isLoggedIn: customerAccount.isLoggedIn(),
     footer,
   };
 }
@@ -141,13 +140,16 @@ export function Layout({children}: {children?: React.ReactNode}) {
       </head>
       <body>
         {data ? (
-          <Analytics.Provider
-            cart={data.cart}
-            shop={data.shop}
-            consent={data.consent}
-          >
-            <PageLayout {...data}>{children}</PageLayout>
-          </Analytics.Provider>
+          <CartProvider>
+            <Analytics.Provider
+              // XXX(serhalp) How can we get this here?
+              cart={null}
+              shop={data.shop}
+              consent={data.consent}
+            >
+              <PageLayout {...data}>{children}</PageLayout>
+            </Analytics.Provider>
+          </CartProvider>
         ) : (
           children
         )}
