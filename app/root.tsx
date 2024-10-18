@@ -19,7 +19,7 @@ import favicon from '~/assets/favicon.svg';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import {PageLayout} from '~/components/PageLayout';
-import {CartProvider} from '~/components/CartProvider';
+import {CartProvider, useCart} from '~/components/CartProvider';
 import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
 import {CACHE_1_HOUR_SWR} from '~/lib/page-cache';
 
@@ -135,6 +135,19 @@ function loadDeferredData({context}: LoaderFunctionArgs) {
   };
 }
 
+const CartAwareAnalyticsProvider = ({
+  children,
+  ...props
+}: Omit<Parameters<typeof Analytics.Provider>[0], 'cart'>) => {
+  const cart = useCart();
+
+  return (
+    <Analytics.Provider {...props} cart={cart ?? null}>
+      {children}
+    </Analytics.Provider>
+  );
+};
+
 export function Layout({children}: {children?: React.ReactNode}) {
   const nonce = useNonce();
   const data = useRouteLoaderData<RootLoader>('root');
@@ -150,18 +163,14 @@ export function Layout({children}: {children?: React.ReactNode}) {
       <body>
         {data ? (
           <CartProvider>
-            <Analytics.Provider
-              // XXX(serhalp) How can we get this here?
-              cart={null}
-              shop={data.shop}
-              consent={data.consent}
-            >
+            <CartAwareAnalyticsProvider shop={data.shop} consent={data.consent}>
               <PageLayout {...data}>{children}</PageLayout>
-            </Analytics.Provider>
+            </CartAwareAnalyticsProvider>
           </CartProvider>
         ) : (
           children
         )}
+
         <ScrollRestoration nonce={nonce} />
         <Scripts nonce={nonce} />
       </body>
