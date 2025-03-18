@@ -1,8 +1,4 @@
-import {
-  createHydrogenContext,
-  type HydrogenContext,
-  InMemoryCache,
-} from '@shopify/hydrogen';
+import {createHydrogenContext, type HydrogenContext} from '@shopify/hydrogen';
 import {AppSession} from '~/lib/session';
 import {CART_QUERY_FRAGMENT} from '~/lib/fragments';
 
@@ -22,12 +18,13 @@ export async function createAppLoadContext(
     throw new Error('SESSION_SECRET environment variable is not set');
   }
 
+  const cache = await caches.open('hydrogen');
   const session = await AppSession.init(request, [env.SESSION_SECRET]);
 
   const hydrogenContext = createHydrogenContext({
     env,
     request,
-    cache: new InMemoryCache(),
+    cache,
     waitUntil: executionContext.waitUntil,
     session,
     i18n: {
