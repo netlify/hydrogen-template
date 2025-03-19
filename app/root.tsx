@@ -94,6 +94,8 @@ async function loadCriticalData({context}: LoaderFunctionArgs) {
     // Add other queries here, so that they are loaded in parallel
   ]);
 
+  console.log('HEADER FROM API:', JSON.stringify(header, null, 2));
+
   return {
     header,
   };
