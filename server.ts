@@ -12,6 +12,9 @@ export default async function (
   request: Request,
   netlifyContext: Context,
 ): Promise<Response | undefined> {
+  process.env.NODE_ENV = 'development';
+  globalThis.__H2O_LOG_EVENT = console.log.bind(console);
+
   try {
     const appLoadContext = await createHydrogenAppLoadContext(
       request,
