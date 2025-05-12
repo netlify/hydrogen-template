@@ -1,0 +1,1113 @@
+<html lang="en"><head><style>body {transition: opacity ease-in 0.2s; } 
+body[unresolved] {opacity: 0; display: block; overflow: hidden; position: relative; } 
+</style>
+    <meta charset="UTF+06">
+    <link rel="icon" type="image/jpeg" href="images/HENG.jpeg">
+    <link rel="shortcut icon" type="image/jpeg" href="images/HENG.jpeg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bullish global index data service interactive brokers</title>
+    <link rel="stylesheet" href="styles.css">
+
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 10px solid;
+            border-image: linear-gradient(to right, #1d1a1d, #000000) 1;
+            box-shadow: 0 0 20px rgba(0, 162, 255, 0.5);
+            pointer-events: none;
+            animation: neon-border 1.5s infinite alternate;
+        }
+
+        @keyframes neon-border {
+            0% {
+            box-shadow: 0 0 10px rgba(0, 238, 107, 0.5), 0 0 20px rgba(0, 255, 34, 0.795), 0 0 30px rgba(0, 255, 34, 0.5);
+            }
+            100% {
+            box-shadow: 0 0 20px rgba(255, 2, 2, 0.7), 0 0 40px rgba(255, 0, 179, 0.7), 0 0 60px rgba(255, 0, 200, 0.7);
+            }
+        }
+
+        main {
+            width: 100%;
+            max-width: 600px;
+            padding: 2rem;
+            text-align: center;
+            background-color: #1e1e1e;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            border: 2px solid #1eff00;
+            position: relative;
+            z-index: 1;
+        }
+
+        #currency-pair {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        #trading-pair-select {
+            display: block;
+            margin: 0.5rem auto;
+            text-align: center;
+            background-color: #bebebe13;
+            color: #bbff00;
+            border: 2px solid #2600ff;
+            width: 100%;
+            max-width: 300px;
+            padding: 0.5rem;
+            border-radius: 8px;
+            box-shadow: inset 0 0 10px #00ff62;
+            transition: box-shadow 0.3s ease;
+        }
+
+        #trading-pair-select:hover {
+            box-shadow: inset 0 0 20px #00ff22;
+        }
+
+        #get-signal-btn, #info-btn {
+            display: block;
+            margin: 1rem auto;
+            background-color: #a6ff00;
+            color: #1e1e1e;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            width: 100%;
+            max-width: 300px;
+            border-radius: 8px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 8px rgba(13, 252, 4, 0.959);
+        }
+
+        #get-signal-btn:hover, #info-btn:hover {
+            background-color: #b30000;
+            box-shadow: 0 8px 16px rgba(255, 0, 0, 0.7);
+        }
+
+        #signal-result {
+            margin-top: 1rem;
+            font-size: 1.5rem;
+            color: #ff0000;
+        }
+
+        #countdown {
+            margin-top: 1rem;
+            font-weight: bold;
+            color: #e0e0e0;
+        }
+
+        #countdown-progress {
+            width: 100%;
+            height: 20px;
+            background-color: #1e1e1e;
+            border: 1px solid #9900ff;
+            display: none;
+            border-radius: 8px;
+        }
+
+        #countdown-progress::-webkit-progress-bar {
+            background-color: #1e1e1e;
+        }
+
+        #countdown-progress::-webkit-progress-value {
+            background-color: #ff0000;
+        }
+
+        #countdown-progress::-moz-progress-bar {
+            background-color: #ff0000;
+        }
+
+        footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            padding: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #121212;
+        }
+
+        #footer-content {
+            display: flex;
+            align-items: center;
+            color: #e0e0e0;
+        }
+
+        #HENG-logo {
+            width: 17vh;
+            height: auto;
+            margin-left: 0.5rem;
+        }
+
+       
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.8);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #1e1e1e;
+            margin: 5% auto;
+            padding: 20px;
+            border: 2px solid #ff0000;
+            width: 80%;
+            max-width: 300px;
+            color: #ff0000;
+            box-shadow: 0 4px 8px rgba(255, 0, 0, 0.5);
+            border-radius: 8px;
+        }
+
+        .close {
+            color: #ff0000;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        #submit-password-btn, #contact-modal button {
+            background-color: #ff0000;
+            color: #1e1e1e;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(255, 0, 0, 0.5);
+            transition: box-shadow 0.3s ease;
+            border-radius: 8px;
+        }
+
+        #submit-password-btn:hover, #contact-modal button:hover {
+            box-shadow: 0 8px 16px rgba(255, 0, 0, 0.7);
+        }
+
+        
+        #contact-modal input[type="text"], #password-input {
+            width: 100%;
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            border: 2px solid #ff0000;
+            background-color: #1e1e1e;
+            color: #ff0000;
+            font-family: 'Arial', sans-serif;
+            border-radius: 8px;
+            box-shadow: inset 0 0 10px #ff0000;
+        }
+
+        #password-input::placeholder {
+            color: #ff0000;
+        }
+
+        #password-error {
+            color: #ff0000;
+        }
+
+        @media (max-width: 600px) {
+            main {
+                padding: 1rem;
+            }
+
+            .modal-content {
+                width: 90%;
+            }
+
+            #HENG-logo {
+                width: 12vh;
+            }
+        }
+    </style>
+</head>
+<body>
+  
+    <main>
+        <section id="currency-pair">
+            <h1 style="background: linear-gradient(to bottom, #00A99D, #00CCFF, #0073E6, #002F6C); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">BULLISH BOT 9.3 Beta Version</h1>
+            <h1 style="color: red;">Welcome to Red Premium BULLISH Robots!</h1>
+            <h3>Select your best trading pair, AI-powered bot with high accuracy</h3>
+            <select id="trading-pair-select">
+    <option value="BTC">₿ Bitcoin (BTC)</option>
+    <option value="BTC-OTC">₿ Bitcoin (BTC) OTC</option>
+
+<option value="BONK">🐶 Bonk (BONK)</option>
+<option value="BONK-OTC">🐶 Bonk (BONK) OTC</option>
+
+<option value="TRUMP">🇺🇸 Trump (TRUMP)</option>
+<option value="TRUMP-OTC">🇺🇸 Trump (TRUMP) OTC</option>
+
+<option value="WIF">🎩 Dogwifhat (WIF)</option>
+<option value="WIF-OTC">🎩 Dogwifhat (WIF) OTC</option>
+
+<option value="FOLK">🌐 Folk (FOLK)</option>
+<option value="FOLK-OTC">🌐 Folk (FOLK) OTC</option>
+
+<option value="SHIB">🐕 Shiba Inu (SHIB)</option>
+<option value="SHIB-OTC">🐕 Shiba Inu (SHIB) OTC</option>
+
+<option value="ETH">Ξ Ethereum (ETH)</option>
+<option value="ETH-OTC">Ξ Ethereum (ETH) OTC</option>
+
+<option value="DOGE">Ð Dogecoin (DOGE)</option>
+<option value="DOGE-OTC">Ð Dogecoin (DOGE) OTC</option>
+
+<option value="PEPE">🐸 PepeCoin (PEPE)</option>
+<option value="PEPE-OTC">🐸 PepeCoin (PEPE) OTC</option>
+
+<option value="SOL">◎ Solana (SOL)</option>
+<option value="SOL-OTC">◎ Solana (SOL) OTC</option>
+
+<option value="BNB">★ BNB (BNB)</option>
+<option value="BNB-OTC">★ BNB (BNB) OTC</option>
+
+<option value="EUR/USD">🇪🇺🇺🇸 EUR/USD (EUR/USD)</option>
+<option value="EUR/USD-OTC">🇪🇺🇺🇸 EUR/USD (EUR/USD) OTC</option>
+
+<option value="USD/JPY">🇺🇸🇯🇵 USD/JPY (USD/JPY)</option>
+<option value="USD/JPY-OTC">🇺🇸🇯🇵 USD/JPY (USD/JPY) OTC</option>
+
+<option value="GBP/USD">🇬🇧🇺🇸 GBP/USD (GBP/USD)</option>
+<option value="GBP/USD-OTC">🇬🇧🇺🇸 GBP/USD (GBP/USD) OTC</option>
+
+<option value="USD/CHF">🇺🇸🇨🇭 USD/CHF (USD/CHF)</option>
+<option value="USD/CHF-OTC">🇺🇸🇨🇭 USD/CHF (USD/CHF) OTC</option>
+
+<option value="AUD/USD">🇦🇺🇺🇸 AUD/USD (AUD/USD)</option>
+<option value="AUD/USD-OTC">🇦🇺🇺🇸 AUD/USD (AUD/USD) OTC</option>
+
+<option value="USD/CAD">🇺🇸🇨🇦 USD/CAD (USD/CAD)</option>
+<option value="USD/CAD-OTC">🇺🇸🇨🇦 USD/CAD (USD/CAD) OTC</option>
+
+<option value="NZD/USD">🇳🇿🇺🇸 NZD/USD (NZD/USD)</option>
+<option value="NZD/USD-OTC">🇳🇿🇺🇸 NZD/USD (NZD/USD) OTC</option>
+
+<option value="EUR/JPY">🇪🇺🇯🇵 EUR/JPY (EUR/JPY)</option>
+<option value="EUR/JPY-OTC">🇪🇺🇯🇵 EUR/JPY (EUR/JPY) OTC</option>
+
+<option value="GBP/JPY">🇬🇧🇯🇵 GBP/JPY (GBP/JPY)</option>
+<option value="GBP/JPY-OTC">🇬🇧🇯🇵 GBP/JPY (GBP/JPY) OTC</option>
+
+<option value="EUR/GBP">🇪🇺🇬🇧 EUR/GBP (EUR/GBP)</option>
+<option value="EUR/GBP-OTC">🇪🇺🇬🇧 EUR/GBP (EUR/GBP) OTC</option>
+
+<option value="USD/BRL">🇺🇸🇧🇷 USD/BRL (USD/BRL)</option>
+<option value="USD/BRL-OTC">🇺🇸🇧🇷 USD/BRL (USD/BRL) OTC</option>
+
+<option value="USD/CNH">🇺🇸🇨🇳 USD/CNH (USD/CNH)</option>
+<option value="USD/CNH-OTC">🇺🇸🇨🇳 USD/CNH (USD/CNH) OTC</option>
+
+<option value="USD/INR">🇺🇸🇮🇳 USD/INR (USD/INR)</option>
+<option value="USD/INR-OTC">🇺🇸🇮🇳 USD/INR (USD/INR) OTC</option>
+
+<option value="USD/PKR">🇺🇸🇵🇰 USD/PKR (USD/PKR)</option>
+<option value="USD/PKR-OTC">🇺🇸🇵🇰 USD/PKR (USD/PKR) OTC</option>
+
+<option value="USD/BDT">🇺🇸🇧🇩 USD/BDT (USD/BDT)</option>
+<option value="USD/BDT-OTC">🇺🇸🇧🇩 USD/BDT (USD/BDT) OTC</option>
+
+<option value="USD/MXN">🇺🇸🇲🇽 USD/MXN (USD/MXN)</option>
+<option value="USD/MXN-OTC">🇺🇸🇲🇽 USD/MXN (USD/MXN) OTC</option>
+
+<option value="USD/ZAR">🇺🇸🇿🇦 USD/ZAR (USD/ZAR)</option>
+<option value="USD/ZAR-OTC">🇺🇸🇿🇦 USD/ZAR (USD/ZAR) OTC</option>
+
+<option value="USD/TRY">🇺🇸🇹🇷 USD/TRY (USD/TRY)</option>
+<option value="USD/TRY-OTC">🇺🇸🇹🇷 USD/TRY (USD/TRY) OTC</option>
+
+<option value="USD/EGP">🇺🇸🇪🇬 USD/EGP (USD/EGP)</option>
+<option value="USD/EGP-OTC">🇺🇸🇪🇬 USD/EGP (USD/EGP) OTC</option>
+
+<option value="USD/IDR">🇺🇸🇮🇩 USD/IDR (USD/IDR)</option>
+<option value="USD/IDR-OTC">🇺🇸🇮🇩 USD/IDR (USD/IDR) OTC</option>
+
+<option value="USD/PHP">🇺🇸🇵🇭 USD/PHP (USD/PHP)</option>
+<option value="USD/PHP-OTC">🇺🇸🇵🇭 USD/PHP (USD/PHP) OTC</option>
+
+<option value="USD/NGN">🇺🇸🇳🇬 USD/NGN (USD/NGN)</option>
+<option value="USD/NGN-OTC">🇺🇸🇳🇬 USD/NGN (USD/NGN) OTC</option>
+
+<option value="EUR/AUD">🇪🇺🇦🇺 EUR/AUD (EUR/AUD)</option>
+<option value="EUR/AUD-OTC">🇪🇺🇦🇺 EUR/AUD (EUR/AUD) OTC</option>
+
+<option value="NZD/CAD">🇳🇿🇨🇦 NZD/CAD (NZD/CAD)</option>
+<option value="NZD/CAD-OTC">🇳🇿🇨🇦 NZD/CAD (NZD/CAD) OTC</option>
+
+<option value="GBP/NZD">🇬🇧🇳🇿 GBP/NZD (GBP/NZD)</option>
+<option value="GBP/NZD-OTC">🇬🇧🇳🇿 GBP/NZD (GBP/NZD) OTC</option>
+
+<option value="AAPL">🍎 Apple (AAPL)</option>
+<option value="AAPL-OTC">🍎 Apple (AAPL) OTC</option>
+
+<option value="MSFT">🖥️ Microsoft (MSFT)</option>
+<option value="MSFT-OTC">🖥️ Microsoft (MSFT) OTC</option>
+
+<option value="AMZN">📦 Amazon (AMZN)</option>
+<option value="AMZN-OTC">📦 Amazon (AMZN) OTC</option>
+
+<option value="AUD/JPY">🇦🇺🇯🇵 AUD/JPY (AUD/JPY)</option>
+<option value="AUD/JPY-OTC">🇦🇺🇯🇵 AUD/JPY (AUD/JPY) OTC</option>
+
+<option value="AUD/CAD">🇦🇺🇨🇦 AUD/CAD (AUD/CAD)</option>
+<option value="AUD/CAD-OTC">🇦🇺🇨🇦 AUD/CAD (AUD/CAD) OTC</option>
+
+<option value="CAD/JPY">🇨🇦🇯🇵 CAD/JPY (CAD/JPY)</option>
+<option value="CAD/JPY-OTC">🇨🇦🇯🇵 CAD/JPY (CAD/JPY) OTC</option>
+
+<option value="GBP/AUD">🇬🇧🇦🇺 GBP/AUD (GBP/AUD)</option>
+<option value="GBP/AUD-OTC">🇬🇧🇦🇺 GBP/AUD (GBP/AUD) OTC</option>
+
+<option value="GBP/CAD">🇬🇧🇨🇦 GBP/CAD (GBP/CAD)</option>
+<option value="GBP/CAD-OTC">🇬🇧🇨🇦 GBP/CAD (GBP/CAD) OTC</option>
+
+<option value="USD/DZD">🇺🇸🇩🇿 USD/DZD (USD/DZD)</option>
+<option value="USD/DZD-OTC">🇺🇸🇩🇿 USD/DZD (USD/DZD) OTC</option>
+
+<option value="USD/ARS">🇺🇸🇦🇷 USD/ARS (USD/ARS)</option>
+<option value="USD/ARS-OTC">🇺🇸🇦🇷 USD/ARS (USD/ARS) OTC</option>
+
+<option value="AUD/NZD">🇦🇺🇳🇿 AUD/NZD (AUD/NZD)</option>
+<option value="AUD/NZD-OTC">🇦🇺🇳🇿 AUD/NZD (AUD/NZD) OTC</option>
+
+<option value="EUR/CAD">🇪🇺🇨🇦 EUR/CAD (EUR/CAD)</option>
+<option value="EUR/CAD-OTC">🇪🇺🇨🇦 EUR/CAD (EUR/CAD) OTC</option>
+
+<option value="GBP/CHF">🇬🇧🇨🇭 GBP/CHF (GBP/CHF)</option>
+<option value="GBP/CHF-OTC">🇬🇧🇨🇭 GBP/CHF (GBP/CHF) OTC</option>
+
+<option value="NZD/JPY">🇳🇿🇯🇵 NZD/JPY (NZD/JPY)</option>
+<option value="NZD/JPY-OTC">🇳🇿🇯🇵 NZD/JPY (NZD/JPY) OTC</option>
+
+<option value="NZD/CHF">🇳🇿🇨🇭 NZD/CHF (NZD/CHF)</option>
+<option value="NZD/CHF-OTC">🇳🇿🇨🇭 NZD/CHF (NZD/CHF) OTC</option>
+
+<option value="USD/COP">🇺🇸🇨🇴 USD/COP (USD/COP)</option>
+<option value="USD/COP-OTC">🇺🇸🇨🇴 USD/COP (USD/COP) OTC</option>
+
+<option value="EUR/CHF">🇪🇺🇨🇭 EUR/CHF (EUR/CHF)</option>
+<option value="EUR/CHF-OTC">🇪🇺🇨🇭 EUR/CHF (EUR/CHF) OTC</option>
+
+<option value="EUR/NZD">🇪🇺🇳🇿 EUR/NZD (EUR/NZD)</option>
+<option value="EUR/NZD-OTC">🇪🇺🇳🇿 EUR/NZD (EUR/NZD) OTC</option>
+
+<option value="AUD/CHF">🇦🇺🇨🇭 AUD/CHF (AUD/CHF)</option>
+<option value="AUD/CHF-OTC">🇦🇺🇨🇭 AUD/CHF (AUD/CHF) OTC</option>
+
+<option value="CAD/CHF">🇨🇦🇨🇭 CAD/CHF (CAD/CHF)</option>
+<option value="CAD/CHF-OTC">🇨🇦🇨🇭 CAD/CHF (CAD/CHF) OTC</option>
+
+<option value="CHF/JPY">🇨🇭🇯🇵 CHF/JPY (CHF/JPY)</option>
+<option value="CHF/JPY-OTC">🇨🇭🇯🇵 CHF/JPY (CHF/JPY) OTC</option>
+
+<option value="EUR/SGD">🇪🇺🇸🇬 EUR/SGD (EUR/SGD)</option>
+<option value="EUR/SGD-OTC">🇪🇺🇸🇬 EUR/SGD (EUR/SGD) OTC</option>
+
+<option value="AMEX">💳 American Express (AMEX)</option>
+<option value="AMEX-OTC">💳 American Express (AMEX) OTC</option>
+
+<option value="BOEING">✈️ Boeing Company (BOEING)</option>
+<option value="BOEING-OTC">✈️ Boeing Company (BOEING) OTC</option>
+
+<option value="MCDONALDS">🍔 McDonald's (MCDONALDS)</option>
+<option value="MCDONALDS-OTC">🍔 McDonald's (MCDONALDS) OTC</option>
+
+<option value="PFIZER">💊 Pfizer Inc (PFIZER)</option>
+<option value="PFIZER-OTC">💊 Pfizer Inc (PFIZER) OTC</option>
+
+<option value="FACEBOOK">📱 Facebook Inc (FACEBOOK)</option>
+<option value="FACEBOOK-OTC">📱 Facebook Inc (FACEBOOK) OTC</option>
+
+<option value="JNJ">🩺 Johnson &amp; Johnson (JNJ)</option>
+<option value="JNJ-OTC">🩺 Johnson &amp; Johnson (JNJ) OTC</option>
+
+<option value="INTEL">💻 Intel (INTEL)</option>
+<option value="INTEL-OTC">💻 Intel (INTEL) OTC</option>
+
+<option value="MICROSOFT">🖥️ Microsoft (MICROSOFT)</option>
+<option value="MICROSOFT-OTC">🖥️ Microsoft (MICROSOFT) OTC</option>
+
+<option value="DOWJONES">📈 Dow Jones (DOWJONES)</option>
+<option value="DOWJONES-OTC">📈 Dow Jones (DOWJONES) OTC</option>
+
+<option value="NIKKEI225">📊 Nikkei 225 (NIKKEI225)</option>
+<option value="NIKKEI225-OTC">📊 Nikkei 225 (NIKKEI225) OTC</option>
+
+<option value="NASDAQ100">📉 NASDAQ 100 (NASDAQ100)</option>
+<option value="NASDAQ100-OTC">📉 NASDAQ 100 (NASDAQ100) OTC</option>
+
+<option value="UKBRENT">🛢️ UK Brent (UKBRENT)</option>
+<option value="UKBRENT-OTC">🛢️ UK Brent (UKBRENT) OTC</option>
+
+<option value="USCRUDE">🛢️ US Crude (USCRUDE)</option>
+<option value="USCRUDE-OTC">🛢️ US Crude (USCRUDE) OTC</option>
+
+<option value="GOLD">🪙 Gold (GOLD)</option>
+<option value="GOLD-OTC">🪙 Gold (GOLD) OTC</option>
+
+<option value="SILVER">🥈 Silver (SILVER)</option>
+<option value="SILVER-OTC">🥈 Silver (SILVER) OTC</option>
+
+    <option value="TSLA">🚗 Tesla (TSLA)</option>
+    <option value="TSLA-OTC">🚗 Tesla (TSLA) OTC</option>
+            </select>
+            <button id="get-signal-btn" style="display: block;">Get Signal</button>
+            <label for="info-btn"><span style="color: rgb(255, 9, 9); font-weight: bold;">Warning:</span> <span style="font-weight: bold;">You can create your Quotex account using bot link too</span></label>
+            <button id="info-btn" style="background: linear-gradient(to right, #ff0000, #ff7f00); border: none; cursor: pointer; font-weight: 900; color: #fff; padding: 10px; border-radius: 5px;">Sign Up Quotex</button>
+            <p id="signal-result" style="color: red;">Signal: ⬇ Down for BTC</p>
+            <div id="countdown-container">
+                <p id="countdown"></p>
+                <progress id="countdown-progress" value="60" max="60" style="display: none;"></progress>
+            </div>
+        </section>
+    </main>
+    <footer>
+        
+        <div id="footer-content">
+            <span>Powered By</span>
+            <a href="https://t.me/Bullishofking" target="_blank">
+                <img src="images/BULLISH.png" alt="BULLISH Logo" id="BULLISH-logo">
+            </a>
+        </div>
+    </footer>
+    <div id="password-modal" class="modal" style="display: none;">
+        <div class="modal-content" style="text-align: center;">
+            <span class="close">�</span>
+            <h3 style="font-size: 15px; font-weight: 700; background: linear-gradient(to right, #FF5733, #33FF57, #3357FF); -webkit-background-clip: text; color: transparent; text-align: center; padding: 10px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); transform: scale(1.1); transition: transform 0.3s ease;">
+             95% Accuracy Signals for Quotex
+            </h3>
+            <h5>Sign Up for Quotex using bot link..</h5>
+            
+            <button id="open-link-btn" style="background: linear-gradient(to right, green, blue); border: none; cursor: pointer; font-weight: 900; color: #ff0000; text-decoration: underline; padding: 10px; border-radius: 5px;">
+                <strong style="background-color: rgb(77, 255, 49); color: black; padding: 5px;">Create a free account</strong>
+            </button>
+            <p style="margin-top: 0.001rem;">💡 My telegram channel @BullishofkingR trading You can join it for get more free! 🚀</p>
+            
+            <input type="password" id="password-input" placeholder="Enter My password" style="width: 80%; padding: 0.5rem; margin: 0.5rem 0; border: 2px solid #ff0000; background-color: #1e1e1e; color: #ff0000; font-family: 'Arial', sans-serif; border-radius: 8px; box-shadow: inset 0 0 10px #ff0000;">
+            <button id="submit-password-btn">UNLOCK BOT</button>
+            <p id="password-error" style="display: none;">Please make a deposit. If you’ve deposited but see “invalid,” don’t worry—contact support, and they’ll activate your ID, id@SokAlike007</p>
+        </div>
+        <script>
+            document.getElementById('open-link-btn').addEventListener('click', function() {
+                window.open('https://market-qx.pro/sign-up/?lid=480736', '_blank');
+            });
+        </script>
+    </div>
+    <div id="contact-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">�</span>
+            <h2>💬Contact Us!🚀</h2>
+            <label for="help-email" style="display: block; text-align: center;">Green Bot members: Use your current ID to receive signals—no new account needed. Facing issues? Please send an email for assistance.</label>
+            <input type="text" id="help-email" value="id@BullishofkingR" readonly="" style="font-size: 1.2rem; width: 100%; text-align: center; cursor: pointer;" onclick="copyEmail()">
+
+<p id="copy-message" style="display: none; color: green; font-weight: bold; text-align: center;">Email Copied!</p>
+
+<script>
+  function copyEmail() {
+    var emailInput = document.getElementById("help-email");
+
+    // Select the text
+    emailInput.select();
+    emailInput.setSelectionRange(0, 99999); // For mobile devices
+
+    // Copy to clipboard
+    document.execCommand("copy");
+
+    // Show confirmation message
+    var message = document.getElementById("copy-message");
+    message.style.display = "block";
+
+    // Hide message after 2 seconds
+    setTimeout(function() {
+      message.style.display = "none";
+    }, 2000);
+  }
+</script>
+            
+            <label for="dev-email" style="display: block; text-align: center;">Create your own signal website? Contact us via email! Estimated cost: $4500–$7000 With HENG Api Key.</label>
+            <input type="text" id="dev-email" value="dev@BullishofkingR" readonly="" style="font-size: 1.2rem; width: 100%; text-align: center;" ondblclick="copyDevEmail()">
+            <p id="copy-message" style="color: green; display: none; text-align: center;">Email copied!</p>
+        </div>
+    </div>
+
+    <script>
+        const PASSWORD_EXPIRY_TIME = 2 * 60 * 60 * 1000; // 2 hours in milliseconds
+
+        // Check if the password has already been entered and is still valid
+        let isPasswordEntered = false;
+        const passwordTimestamp = sessionStorage.getItem('passwordTimestamp');
+        if (passwordTimestamp && (Date.now() - parseInt(passwordTimestamp, 10)) < PASSWORD_EXPIRY_TIME) {
+            isPasswordEntered = true;
+        } else {
+            sessionStorage.removeItem('passwordTimestamp');
+        }
+
+        function generateSignal() {
+            const signals = ['Up', 'Down'];
+            const randomSignal = signals[Math.floor(Math.random() * signals.length)];
+            const selectedPair = document.getElementById('trading-pair-select').value;
+            const signalResultElement = document.getElementById('signal-result');
+            const arrow = randomSignal === 'Up' ? '⬆' : '⬇';
+            signalResultElement.innerHTML = `Signal: ${arrow} ${randomSignal} for ${selectedPair}`;
+            signalResultElement.style.color = randomSignal === 'Up' ? 'green' : 'red';
+            startCountdown();
+        }
+
+        function startCountdown() {
+            const countdownElement = document.getElementById('countdown');
+            const progressElement = document.getElementById('countdown-progress');
+            const getSignalBtn = document.getElementById('get-signal-btn');
+            let timeLeft = 60; // Set to 1 minute (60 seconds)
+
+            countdownElement.innerText = `Next signal in: ${timeLeft} seconds`;
+            progressElement.value = 0;
+            progressElement.max = timeLeft;
+            progressElement.style.display = 'block';
+            getSignalBtn.style.display = 'none'; // Hide the button
+
+            const countdownInterval = setInterval(() => {
+                timeLeft--;
+                countdownElement.innerText = `Next signal in: ${timeLeft} seconds`;
+                progressElement.value = 60 - timeLeft;
+
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownElement.innerText = '';
+                    progressElement.style.display = 'none';
+                    getSignalBtn.style.display = 'block'; // Show the button again
+                }
+            }, 1000);
+        }
+
+        document.getElementById('submit-password-btn').addEventListener('click', function(event) {
+    event.preventDefault(); // Prevent the default form submission
+    const password = document.getElementById('password-input').value;
+    const validPasswords = [
+        { password: 'Raton033' }, { password: 'Bullish' }, { password: '53137356' }, { password: '529451202' },
+        { password: '529451203' }, { password: '529451204' }, { password: '53114428' }, { password: '529451207' },
+        { password: '53200205' }, { password: '53432586' }, { password: '53316047' }, { password: '53435613' },
+        { password: '529451208' }, { password: '53330217' }, { password: '52954276' }, { password: '53502149' },
+        { password: '53463918' }, { password: '53464875' }, { password: '53460237' }, { password: '53261853' },
+        { password: '53469457' }, { password: '53359901' }, { password: '53328197' }, { password: '53713122' },
+        { password: '53542759' }, { password: '53698690' }, { password: '53654728' }, { password: '53741839' },
+        { password: '53685360' }, { password: '53684745' }, { password: '53753589' }, { password: '53299531' },
+        { password: '53840354' }, { password: '54038126' }, { password: 'Bullish' }, { password: '54100350' },
+        { password: '54222698' }, { password: '53442068' }, { password: '54225292' }, { password: '53850122' },
+        { password: '54443761' }, { password: '54428380' }, { password: '53746727' }, { password: '54453890' },
+        { password: '54050707' }, { password: '54471056' }, { password: '54321256' }, { password: '54041525' },
+        { password: '54271938' }, { password: '54117877' }, { password: '46120660z' }, { password: '54229757' },
+        { password: '53813781' }, { password: '53905768' }, { password: '54101597' }, { password: '53827532' },
+        { password: '54487779' }, { password: '54486862' }, { password: '54680602' }, { password: '54663436' },
+{ password: 'Raton033' }, { password: '54492233' }, { password: '54536501' }, { password: '54681801' },
+{ password: '54723169' }, { password: '54466046' }, { password: '54612875' }, { password: '53189633' },
+{ password: '53386450' }, { password: '54549070' }, { password: '54513238' }, { password: '54640357' },
+{ password: '54718976' }, { password: '54676933' }, { password: '54640817' }, { password: '53982646' },
+{ password: '53721116' }, { password: '54629252' }, { password: '54659498' }, { password: '53711509' },
+{ password: '55081433' }, { password: '55035245' }, { password: '54777920' }, { password: '54891318' },
+{ password: '55061166' }, { password: '55019126' }, { password: '55050234' }, { password: '54921188' },
+{ password: '55041506' }, { password: '54999794' }, { password: '54871235' }, { password: '54812691' },
+{ password: '55104314' }, { password: '54977632' }, { password: '54586103' }, { password: '54777258' },
+{ password: '55095508' }, { password: '55381247' }, { password: '57142792' }, { password: '54793870' },
+{ password: '54727086' }, { password: '54923310' }, { password: '54653914' }, { password: '54770307' },
+{ password: '55335844' }, { password: '55302037' }, { password: '55369095' }, { password: '55250924' },
+{ password: '55283003' }, { password: '55365554' }, { password: '55401126' }, { password: '55185937' },
+{ password: '53715350' }, { password: '55264282' }, { password: '53131448' }, { password: '54296843' },
+{ password: '55213442' }, { password: '55357735' }, { password: '55187368' }, { password: '53774405' },
+{ password: '55138445' }, { password: '55397578' }, { password: '55242160' }, { password: '55244547' },
+{ password: '55144502' }, { password: '55102741' }, { password: '55115010' }, { password: '55217733' },
+{ password: '55647729' }, { password: '55413848' }, { password: '55530227' }, { password: '55565149' },
+{ password: '55686933' }, { password: '55674134' }, { password: '55204201' }, { password: '55532607' },
+{ password: '55685655' }, { password: '55576428' }, { password: '55466619' }, { password: '55752707' },
+{ password: '55719328' }, { password: '55601638' }, { password: '55564972' }, { password: '55477516' },
+{ password: '55743018' }, { password: '55760269' }, { password: '55406625' }, { password: '55541438' },
+{ password: '55833049' }, { password: '55641689' }, { password: '55404630' }, { password: '55304826' },
+{ password: '56422468' }, { password: '56242089' }, { password: '55845335' }, { password: '56198006' },
+{ password: '56466544' }, { password: '56164416' }, { password: '55904017' }, { password: '56209846' },
+{ password: '56460390' }, { password: '56157835' }, { password: '55977253' }, { password: '56109574' },
+{ password: '56293310' }, { password: '56280355' }, { password: '55868138' }, { password: '56002378' },
+{ password: '56462293' }, { password: '56238841' }, { password: '56042977' }, { password: '56206473' },
+{ password: '56405900' }, { password: '56253214' }, { password: '55814388' }, { password: '56107578' },
+{ password: '56733227' }, { password: '56566396' }, { password: '56473687' }, { password: '56546559' },
+{ password: '56723182' }, { password: '56651769' }, { password: '56510902' }, { password: '56733801' },
+{ password: '56686913' }, { password: '56406342' }, { password: '56491257' }, { password: '56559658' },
+{ password: '56697864' }, { password: '56572552' }, { password: '56564099' }, { password: '56216153' },
+{ password: '56723182' }, { password: '56565206' }, { password: '56557550' }, { password: '56784874' },
+{ password: '56702170' }, { password: '56566633' }, { password: '56800841' }, { password: '56793965' },
+{ password: '56964532' }, { password: '56939191' }, { password: '56456139' }, { password: '56809564' },
+{ password: '57113765' }, { password: '57015086' }, { password: '56738237' }, { password: '56838750' },
+{ password: '57105101' }, { password: '56903452' }, { password: '56824145' }, { password: '57053665' },
+{ password: '57079105' }, { password: '56845453' }, { password: '56910295' }, { password: '56832965' },
+{ password: '57067725' }, { password: '57037713' }, { password: '56900090' }, { password: '57032252' },
+{ password: '57115670' }, { password: '56830568' }, { password: '56864821' }, { password: '56875554' },
+        { password: '53858210' }, { password: '53876180' }, { password: '53843950' }, { password: '53872871' },
+        { password: '53753589' }, { password: '53780797' }, { password: '53804786' }, { password: '53795027' },
+        { password: '53337665' }, { password: '53762006' }, { password: '53133069' }, { password: '53151562' },
+        { password: '57146147' }, { password: '57087788' }, { password: '57178793' }, { password: '57395667' },
+        { password: '123x' }, { password: '57153123' }, { password: '57286997' }, { password: '57315655' },
+        { password: '57078050' }, { password: '57156212' }, { password: '57399726' }, { password: '57316147' },
+        { password: '57876918' }, { password: '57641919' }, { password: '57877275' }, { password: '57178661' },
+        { password: '57001566' }, { password: '57707742' }, { password: '55818259' }, { password: '58040818' },
+        { password: '57598567' }, { password: '57554576' }, { password: '57627299' }, { password: '5315x1562' },
+        { password: '58116395' }, { password: '56968861' }, { password: '57178793' }, { password: '57633388' },
+        { password: '58116395' }, { password: '57425645' }, { password: '57435101' }, { password: '57490473' },
+        { password: '58093291' }, { password: '57384956' }, { password: '58035500' }, { password: '57774871' },
+        
+        
+    ];
+    const passwordEntry = validPasswords.find(entry => entry.password === password);
+    
+    if (passwordEntry) {
+        alert('Access Granted');
+        document.getElementById('password-modal').style.display = 'none';
+        isPasswordEntered = true;
+        sessionStorage.setItem('passwordTimestamp', Date.now().toString());
+        generateSignal();
+    } else {
+        alert('Access Denied, Create Quotex And Deposit $30-$500');
+        document.getElementById('password-error').style.display = 'block';
+    }
+});
+
+        document.getElementById('get-signal-btn').addEventListener('click', function() {
+            if (isPasswordEntered) {
+                generateSignal();
+            } else {
+                document.getElementById('password-modal').style.display = 'block';
+            }
+        });
+
+        document.getElementsByClassName('close')[0].addEventListener('click', function() {
+            document.getElementById('password-modal').style.display = 'none';
+        });
+
+        document.getElementsByClassName('close')[1].addEventListener('click', function() {
+            document.getElementById('contact-modal').style.display = 'none';
+        });
+
+        window.addEventListener('click', function(event) {
+            if (event.target === document.getElementById('password-modal')) {
+                document.getElementById('password-modal').style.display = 'none';
+            }
+            if (event.target === document.getElementById('contact-modal')) {
+                document.getElementById('contact-modal').style.display = 'none';
+            }
+        });
+
+        document.getElementById('info-btn').addEventListener('click', function() {
+            window.open('https://market-qx.pro/sign-up/?lid=480736', '_blank');
+        });
+
+        document.getElementById('contact-btn').addEventListener('click', function() {
+            document.getElementById('contact-modal').style.display = 'block';
+        });
+    </script>
+    
+    <!-- Add Font Awesome CSS -->
+<link rel="stylesheet" href="css/all.min.css">
+
+<!-- Telegram Blue + Red Accent Button -->
+<a href="https://t.me/BullishofkingR" target="_blank" class="telegram-dual-btn" aria-label="Chat on Telegram">
+  <div class="btn-content">
+    <i class="fab fa-telegram-plane"></i>
+    <div class="text-container">
+      <span class="main-text">Telegram Chat</span>
+      <span class="sub-text">Contact our Support</span>
+    </div>
+  </div>
+</a>
+
+<style>
+.telegram-dual-btn {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  z-index: 9999;
+  background: linear-gradient(135deg, #0088cc 0%, #006699 100%);
+  color: white;
+  padding: 15px 25px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  text-decoration: none;
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  box-shadow: 0 0 10px #0088cc, 0 0 20px #ff3366, 0 0 40px #0088cc;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  overflow: hidden;
+  animation: dual-glow 2s infinite alternate, wave-pulse 3s infinite ease-in-out;
+}
+
+.btn-content {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  position: relative;
+}
+
+.fab.fa-telegram-plane {
+  font-size: 24px;
+  transition: transform 0.3s ease;
+  text-shadow: 0 0 8px rgba(0, 136, 204, 0.6);
+}
+
+.text-container {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.3;
+}
+
+.main-text {
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  text-shadow: 0 0 8px rgba(0, 136, 204, 0.4);
+}
+
+.sub-text {
+  font-size: 12px;
+  opacity: 0.9;
+  font-weight: 400;
+  text-shadow: 0 0 5px rgba(255, 51, 102, 0.3);
+}
+
+/* Dual-Color Glow Animation */
+@keyframes dual-glow {
+  0% {
+    box-shadow: 0 0 10px #0088cc, 0 0 20px #ff3366, 0 0 40px #0088cc;
+  }
+  100% {
+    box-shadow: 0 0 15px #0088cc, 0 0 30px #ff3366, 0 0 60px #0088cc;
+  }
+}
+
+/* Enhanced Wave Animation */
+@keyframes wave-pulse {
+  0%, 100% { transform: translateY(1) scale(1); }
+  25% { transform: translateY(-4px) scale(1.03) rotate(-2deg); }
+  50% { transform: translateY(0) scale(0.98) rotate(2deg); }
+  75% { transform: translateY(3px) scale(1.01); }
+}
+
+/* Hover Effects */
+.telegram-dual-btn:hover {
+  transform: translateY(-3px);
+  background: linear-gradient(135deg, #0077b3 0%, #005580 100%);
+  animation: dual-glow-hover 0.8s infinite alternate, wave-pulse 1.2s infinite ease-in-out;
+}
+
+@keyframes dual-glow-hover {
+  0% {
+    box-shadow: 0 0 15px #0088cc, 0 0 30px #ff0066, 0 0 60px #0088cc;
+  }
+  100% {
+    box-shadow: 0 0 25px #0088cc, 0 0 50px #ff0066, 0 0 100px #0088cc;
+  }
+}
+
+.telegram-dual-btn:hover .fab.fa-telegram-plane {
+  transform: rotate(-45deg) scale(1.2);
+  text-shadow: 0 0 12px rgba(0, 136, 204, 0.8);
+}
+
+/* Active State */
+.telegram-dual-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 0 15px #0088cc, 0 0 30px #ff3366, 0 0 60px #0088cc;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .telegram-dual-btn {
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 20px;
+  }
+  
+  .main-text { font-size: 14px; }
+  .sub-text { font-size: 11px; }
+}
+</style>
+    
+    <script>
+        // Disable right-click menu
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+    
+        // Disable keyboard shortcuts for viewing source or inspecting elements
+        document.addEventListener('keydown', function(e) {
+            // List of blocked keys
+            if (
+                // Disable F12 (DevTools)
+                e.keyCode === 123 || 
+                // Disable Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U for Windows
+                (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) || 
+                (e.ctrlKey && e.key === 'U') ||
+                // Disable Command+Option+U, Command+Shift+C for Mac
+                (e.metaKey && e.altKey && e.key === 'u') ||
+                (e.metaKey && e.shiftKey && e.key === 'c') ||
+                (e.metaKey && e.key === 'u') ||
+                // Additional checks for other combinations
+                (e.ctrlKey && e.shiftKey && e.key === 'K')
+            ) {
+                e.preventDefault();
+                alert('This action is disabled.');
+            }
+        });
+    
+        // Extra: Disable drag-and-drop text or image selection
+        document.addEventListener('dragstart', function(e) {
+            e.preventDefault();
+        });
+    </script>
+   <style>
+    /* === Cyberpunk Background === */
+    body {
+        margin: 0;
+        padding: 0;
+        overflow: hidden;
+        position: relative;
+        min-height: 100vh;
+        background: #001f00;
+    }
+
+    /* Matrix Rain Container */
+    .matrix-rain {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
+        overflow: hidden;
+    }
+
+    /* Cyber Grid Overlay */
+    .cyber-grid {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+            linear-gradient(rgba(0, 255, 0, 0.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0, 255, 0, 0.1) 1px, transparent 1px);
+        background-size: 20px 20px;
+        z-index: 1;
+        animation: gridScan 15s linear infinite;
+        pointer-events: none;
+    }
+
+    /* GROK Mouse Tracker */
+    .grok {
+        position: absolute;
+        pointer-events: none;
+        font-size: 2em;
+        font-weight: 900;
+        text-transform: uppercase;
+        color: #ff003c;
+        text-shadow: 
+            0 0 10px #ff003c,
+            0 0 20px #ededed,
+            0 0 30px #ff003c;
+        mix-blend-mode: screen;
+        transform: translate(-50%, -50%);
+        opacity: 0.9;
+        z-index: 2;
+        animation: grokGlitch 2s infinite;
+    }
+
+    /* Animations */
+    @keyframes gridScan {
+        0% { background-position: 0 -100%; }
+        100% { background-position: 0 100%; }
+    }
+
+    @keyframes grokGlitch {
+        0%, 100% { transform: translate(-50%, -50%) skew(0deg); }
+        25% { transform: translate(-51%, -49%) skew(2deg); }
+        75% { transform: translate(-49%, -51%) skew(-2deg); }
+    }
+
+    @keyframes fall {
+        0% { transform: translateY(-100%); }
+        100% { transform: translateY(100vh); }
+    }
+</style>
+
+<!-- Background Elements -->
+<div class="matrix-rain"><div style="position: absolute; left: 28.0655%; color: rgb(26, 255, 0); animation: 4.89773s linear 0s 1 normal none running fall; pointer-events: none;">0</div><div style="position: absolute; left: 1.87403%; color: rgb(0, 191, 255); animation: 3.96224s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 25.1549%; color: rgb(255, 34, 0); animation: 3.07239s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 44.2927%; color: rgb(0, 255, 54); animation: 2.65577s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 57.8543%; color: rgb(255, 0, 95); animation: 2.55806s linear 0s 1 normal none running fall; pointer-events: none;">0</div><div style="position: absolute; left: 93.3528%; color: rgb(4, 255, 0); animation: 4.56156s linear 0s 1 normal none running fall; pointer-events: none;">0</div><div style="position: absolute; left: 74.5705%; color: rgb(166, 255, 0); animation: 4.49786s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 64.3414%; color: rgb(0, 119, 255); animation: 2.91702s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 11.5494%; color: rgb(255, 0, 230); animation: 2.78664s linear 0s 1 normal none running fall; pointer-events: none;">0</div><div style="position: absolute; left: 18.2619%; color: rgb(192, 255, 0); animation: 3.19749s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 84.8338%; color: rgb(255, 241, 0); animation: 2.55615s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 37.9821%; color: rgb(0, 87, 255); animation: 4.73143s linear 0s 1 normal none running fall; pointer-events: none;">0</div><div style="position: absolute; left: 34.2088%; color: rgb(255, 17, 0); animation: 4.21711s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 22.3077%; color: rgb(0, 255, 1); animation: 2.74409s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 73.7931%; color: rgb(255, 0, 255); animation: 3.06714s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 41.3519%; color: rgb(0, 255, 148); animation: 3.50919s linear 0s 1 normal none running fall; pointer-events: none;">0</div><div style="position: absolute; left: 61.5964%; color: rgb(125, 255, 0); animation: 2.24409s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 6.8966%; color: rgb(173, 255, 0); animation: 2.98009s linear 0s 1 normal none running fall; pointer-events: none;">0</div><div style="position: absolute; left: 21.7308%; color: rgb(255, 0, 147); animation: 2.08069s linear 0s 1 normal none running fall; pointer-events: none;">0</div><div style="position: absolute; left: 25.0525%; color: rgb(79, 255, 0); animation: 2.34962s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 14.0196%; color: rgb(112, 0, 255); animation: 4.85994s linear 0s 1 normal none running fall; pointer-events: none;">0</div><div style="position: absolute; left: 45.9079%; color: rgb(0, 223, 255); animation: 4.83725s linear 0s 1 normal none running fall; pointer-events: none;">0</div><div style="position: absolute; left: 91.0737%; color: rgb(0, 255, 172); animation: 2.04126s linear 0s 1 normal none running fall; pointer-events: none;">0</div><div style="position: absolute; left: 32.4955%; color: rgb(0, 255, 7); animation: 2.13732s linear 0s 1 normal none running fall; pointer-events: none;">0</div><div style="position: absolute; left: 36.3483%; color: rgb(146, 255, 0); animation: 4.08252s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 56.541%; color: rgb(255, 220, 0); animation: 3.86138s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 27.4661%; color: rgb(150, 255, 0); animation: 3.22383s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 75.3889%; color: rgb(255, 130, 0); animation: 3.74974s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 30.0432%; color: rgb(0, 216, 255); animation: 3.94411s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 50.4773%; color: rgb(0, 208, 255); animation: 4.21288s linear 0s 1 normal none running fall; pointer-events: none;">0</div><div style="position: absolute; left: 30.1343%; color: rgb(0, 137, 255); animation: 3.95709s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 20.0427%; color: rgb(0, 221, 255); animation: 4.95589s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 58.1565%; color: rgb(215, 255, 0); animation: 3.32624s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 99.1373%; color: rgb(255, 0, 203); animation: 2.7651s linear 0s 1 normal none running fall; pointer-events: none;">0</div><div style="position: absolute; left: 60.3916%; color: rgb(255, 0, 48); animation: 4.39147s linear 0s 1 normal none running fall; pointer-events: none;">0</div><div style="position: absolute; left: 74.6185%; color: rgb(0, 255, 103); animation: 2.68064s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 81.6119%; color: rgb(0, 46, 255); animation: 4.50535s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 55.0506%; color: rgb(0, 218, 255); animation: 3.97355s linear 0s 1 normal none running fall; pointer-events: none;">0</div><div style="position: absolute; left: 85.4167%; color: rgb(0, 31, 255); animation: 2.18069s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 4.93842%; color: rgb(0, 168, 255); animation: 4.596s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 51.0746%; color: rgb(255, 0, 235); animation: 3.18753s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 89.4952%; color: rgb(0, 255, 150); animation: 4.30896s linear 0s 1 normal none running fall; pointer-events: none;">0</div><div style="position: absolute; left: 61.5543%; color: rgb(0, 255, 164); animation: 3.6142s linear 0s 1 normal none running fall; pointer-events: none;">0</div><div style="position: absolute; left: 92.1978%; color: rgb(255, 0, 204); animation: 2.34611s linear 0s 1 normal none running fall; pointer-events: none;">0</div><div style="position: absolute; left: 23.8569%; color: rgb(255, 244, 0); animation: 2.05175s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 0.615106%; color: rgb(0, 255, 12); animation: 2.97834s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 24.4058%; color: rgb(0, 31, 255); animation: 3.65091s linear 0s 1 normal none running fall; pointer-events: none;">0</div><div style="position: absolute; left: 0.466367%; color: rgb(0, 255, 43); animation: 2.60768s linear 0s 1 normal none running fall; pointer-events: none;">0</div><div style="position: absolute; left: 16.2813%; color: rgb(0, 255, 110); animation: 4.90944s linear 0s 1 normal none running fall; pointer-events: none;">1</div><div style="position: absolute; left: 57.8439%; color: rgb(255, 254, 0); animation: 3.43996s linear 0s 1 normal none running fall; pointer-events: none;">1</div></div>
+<div class="cyber-grid"></div>
+<div class="grok" style="opacity: 0.3; font-family: Arial, sans-serif; color: rgb(254, 254, 254); font-size: 1.5em; left: 1127px; top: 418px;">Grok</div>
+
+<style>
+    @media (max-width: 768px) {
+        .grok {
+            font-size: 1em;
+        }
+    }
+</style>
+
+
+<script>
+    // Grok Mouse Tracker
+    const grok = document.querySelector('.grok');
+    let posX = 0, posY = 0;
+    let mouseX = 0, mouseY = 0;
+    const speed = 0.2;
+
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+    });
+
+    const animateGrok = () => {
+        posX += (mouseX - posX) * speed;
+        posY += (mouseY - posY) * speed;
+        grok.style.left = `${posX}px`;
+        grok.style.top = `${posY}px`;
+        requestAnimationFrame(animateGrok);
+    };
+    animateGrok();
+
+    // Matrix Rain Effect
+    function createMatrixRain() {
+        const chars = '01';
+        const container = document.querySelector('.matrix-rain');
+        
+        function createDrop() {
+            const element = document.createElement('div');
+            element.style.position = 'absolute';
+            element.style.left = `${Math.random() * 100}%`;
+            element.style.color = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            element.style.animation = `fall ${Math.random() * 3 + 2}s linear`;
+            element.textContent = chars[Math.floor(Math.random() * chars.length)];
+            element.style.pointerEvents = 'none';
+            container.appendChild(element);
+            
+            setTimeout(() => element.remove(), 5000);
+        }
+        
+        setInterval(createDrop, 100);
+    }
+    createMatrixRain();
+</script>
+
+<div id="glowing-headline" class="glowing-headline" style="display: flex;">
+    <div class="glowing-content">
+        <span class="glowing-icon">✨</span>
+        <div style="text-align: center; width: 100%;">
+            <span class="glowing-text">Each signal works only on one live account created with our link.</span>
+        </div>
+    </div>
+    <button class="glowing-close" onclick="closeGlowingHeadline()">×</button>
+</div>
+
+<style>
+.glowing-headline {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: #1e1e1e;
+    color: #00ff88;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    border-bottom: 2px solid #00ff88;
+    box-shadow: 0 0 15px rgba(0, 255, 136, 0.3);
+}
+
+.glowing-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.glowing-icon {
+    font-size: 1.5em;
+    text-shadow: 0 0 10px #00ff88;
+}
+
+.glowing-text {
+    font-size: 1.1em;
+    font-weight: 500;
+    text-shadow: 0 0 5px #00ff88;
+}
+
+.glowing-close {
+    background: none;
+    border: none;
+    color: #00ff88;
+    font-size: 1.5em;
+    cursor: pointer;
+    padding: 0 10px;
+    transition: color 0.3s ease;
+    position: absolute;
+    right: 20px;
+}
+
+.glowing-close:hover {
+    color: #ff5555;
+}
+
+@media (max-width: 768px) {
+    .glowing-content {
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .glowing-text {
+        font-size: 1em;
+    }
+}
+</style>
+
+<script>
+function closeGlowingHeadline() {
+    const banner = document.getElementById('glowing-headline');
+    banner.style.transform = 'translateY(-100%)';
+    setTimeout(() => banner.remove(), 300);
+    localStorage.setItem('glowingHeadlineClosed', 'true');
+}
+
+window.addEventListener('load', () => {
+    if (!localStorage.getItem('glowingHeadlineClosed')) {
+        document.getElementById('glowing-headline').style.display = 'flex';
+    }
+});
+</script>
+    
+
+<veepn-guard-alert><style>@font-face{font-family:FigtreeVF;src:url(chrome-extension://majdfhpaihoncoakbjgbdhglocklcgno/fonts/FigtreeVF.woff2) format("woff2 supports variations"),url(chrome-extension://majdfhpaihoncoakbjgbdhglocklcgno/fonts/FigtreeVF.woff2) format("woff2-variations");font-weight:100 1000;font-display:swap}</style></veepn-guard-alert><veepn-lock-screen><style>@font-face{font-family:FigtreeVF;src:url(chrome-extension://majdfhpaihoncoakbjgbdhglocklcgno/fonts/FigtreeVF.woff2) format("woff2 supports variations"),url(chrome-extension://majdfhpaihoncoakbjgbdhglocklcgno/fonts/FigtreeVF.woff2) format("woff2-variations");font-weight:100 1000;font-display:swap}</style></veepn-lock-screen></body></html>
