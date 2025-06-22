@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loja Intelectual - Ebooks</title>
+    <style>
+        body {
+            background-color: #000;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #111;
+            padding: 20px;
+            text-align: center;
+        }
+        header h1 {
+            margin: 0;
+            color: #00ffcc;
+        }
+        nav {
+            background-color: #222;
+            padding: 10px;
+            text-align: center;
+        }
+        nav a {
+            color: #00ffcc;
+            margin: 0 15px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .container {
+            padding: 30px;
+            max-width: 1200px;
+            margin: auto;
+        }
+        .ebook {
+            border: 1px solid #333;
+            background-color: #111;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+        .ebook h2 {
+            color: #00ffcc;
+        }
+        .btn {
+            background-color: #00ffcc;
+            color: black;
+            padding: 10px 20px;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 5px;
+        }
+        footer {
+            background-color: #111;
+            text-align: center;
+            padding: 20px;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Loja Intelectual</h1>
+    <p>Ebooks para sua evolução</p>
+</header>
+
+<nav>
+    <a href="#inicio">Início</a>
+    <a href="#catalogo">Catálogo</a>
+    <a href="#sobre">Sobre</a>
+    <a href="#contato">Contato</a>
+</nav>
+
+<div class="container" id="inicio">
+    <h2>Bem-vindo à Loja Intelectual</h2>
+    <p>Encontre os melhores ebooks para transformar sua vida, seu conhecimento e seus resultados. Compre, baixe e comece agora mesmo.</p>
+</div>
+
+<div class="container" id="catalogo">
+    <h2>📚 Catálogo de Ebooks</h2>
+
+    <div class="ebook">
+        <h2>Ebook: como ganhar renda extra</h2>
+        <p>Descubra estratégias práticas comprovadas por especialista .</p>
+        <p><strong>Preço:</strong> R$ 13,99</p>
+        <a class="btn" href="https://wa.me/+5586995347537?text=Quero%20comprar%20o%20ebook%20Como%20Ganhar%20Renda%20Extra">Comprar via WhatsApp</a>
+    </div>
+
+    <div class="ebook">
+        <h2>Ebook: Emagrecer de Vez</h2>
+        <p>O guia definitivo para perder peso sem sofrimento e sem efeito sanfona.</p>
+        <p><strong>Preço:</strong> R$ 19,90</p>
+        <a class="btn" href="https://wa.me/+5586995347537?text=Quero%20comprar%20o%20ebook%20Emagrecer%20de%20Vez">Comprar via WhatsApp</a>
+    </div>
+
+    <div class="ebook">
+        <h2>Ebook: TDAH Infantil</h2>
+        <p>Entenda o TDAH nas crianças e aprenda a lidar com ele de forma prática e eficiente.</p>
+        <p><strong>Preço:</strong> R$ 14,90</p>
+        <a class="btn" href="https://wa.me/+5586995347537?text=Quero%20comprar%20o%20ebook%20TDAH%20Infantil">Comprar via WhatsApp</a>
+    </div>
+
+</div>
+
+<div class="container" id="sobre">
+    <h2>Sobre a Loja Intelectual</h2>
+    <p>Somos apaixonados por conhecimento e transformação. Nossos ebooks são feitos para quem busca evolução pessoal, financeira e profissional.</p>
+</div>
+
+<div class="container" id="contato">
+    <h2>Contato</h2>
+    <p>📲 Atendimento rápido no WhatsApp</p>
+    <a class="btn" href="https://wa.me/+5586995347537">Falar no WhatsApp</a>
+    <p>💳 Pagamento via PIX (enviado diretamente no WhatsApp após seu pedido)</p>
+</div>
+
+<footer>
+    <p>&copy; 2025 Loja Intelectual - Todos os direitos reservados</p>
+</footer>
+
+</body>
+</html>
