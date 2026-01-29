@@ -40,7 +40,7 @@
     "eslint-plugin-hydrogen": "^0.12.3",
     "prettier": "^2.8.4",
     "typescript": "^5.2.2",
-    "vite": "^5.4.3",
+    "vite": "^5.4.21",
     "vite-tsconfig-paths": "^5.0.1"
   },
   "engines": {
