@@ -2,7 +2,6 @@ import {defineConfig} from 'vite';
 import {hydrogen} from '@shopify/hydrogen/vite';
 import {reactRouter} from '@react-router/dev/vite';
 import netlifyReactRouter from '@netlify/vite-plugin-react-router';
-import netlify from '@netlify/vite-plugin';
 import tsconfigPaths from 'vite-tsconfig-paths';
 
 export default defineConfig({
@@ -10,7 +9,6 @@ export default defineConfig({
     hydrogen(),
     reactRouter(),
     netlifyReactRouter({edge: true}),
-    netlify(),
     tsconfigPaths(),
   ],
   build: {
