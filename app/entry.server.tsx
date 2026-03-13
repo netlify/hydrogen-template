@@ -1,6 +1,8 @@
 import {ServerRouter} from 'react-router';
 import {isbot} from 'isbot';
-import {renderToReadableStream} from 'react-dom/server';
+// `server.browser` sounds funny, but it is the correct entry point to use when
+// rendering in a non-Node.js edge environment
+import {renderToReadableStream} from 'react-dom/server.browser';
 import {
   createContentSecurityPolicy,
   type HydrogenRouterContextProvider,
@@ -32,7 +34,7 @@ export default async function handleRequest(
     {
       nonce,
       signal: request.signal,
-      onError(error) {
+      onError(error: unknown) {
         console.error(error);
         responseStatusCode = 500;
       },
